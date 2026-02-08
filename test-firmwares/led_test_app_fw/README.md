@@ -16,7 +16,6 @@ LED test application firmware for validating the EngEmil STM32 Bootloader functi
 cd test-firmwares/led_test_app_fw/application
 # or
 cd application
-git clone https://github.com/chibios/chibios  # First time only
 make clean              # Clean (previous) build artifacts
 make                    # Build and auto-patch test application
 ```
