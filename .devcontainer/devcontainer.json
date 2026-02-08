@@ -1,0 +1,13 @@
+{
+    "name": "test_container",
+    "dockerComposeFile": "docker-compose.yml",
+    "service": "test_service",
+    "shutdownAction": "none",
+    "workspaceFolder": "/workspace",
+    "remoteUser": "engemil",
+    "customizations": {
+        "vscode": {
+        }
+    }
+}
+

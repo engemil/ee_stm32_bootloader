@@ -1,0 +1,7 @@
+
+*/ChibiOS
+*/chibios
+docs/doxygen/html
+docs/doxygen/latex
+*/build
+*/.dep

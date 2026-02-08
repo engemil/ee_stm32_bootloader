@@ -1,0 +1,70 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Bootloader (OpenOCD)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/bootloader/build/bootloader.elf",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${workspaceFolder}/bootloader",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "gdb-multiarch",
+            "miDebuggerServerAddress": "localhost:3333",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Load binary",
+                    "text": "load",
+                    "ignoreFailures": false
+                },
+                {
+                    "description": "Reset target",
+                    "text": "monitor reset halt",
+                    "ignoreFailures": false
+                }
+            ],
+            "preLaunchTask": "Build Debug",
+            "postDebugTask": "",
+            "logging": {
+                "moduleLoad": false,
+                "trace": false,
+                "engineLogging": false,
+                "programOutput": true,
+                "exceptions": true
+            },
+            "linux": {
+                "MIMode": "gdb",
+                "miDebuggerPath": "gdb-multiarch"
+            }
+        },
+        {
+            "name": "Attach to Running Bootloader",
+            "type": "cppdbg",
+            "request": "attach",
+            "program": "${workspaceFolder}/bootloader/build/bootloader.elf",
+            "MIMode": "gdb",
+            "miDebuggerPath": "gdb-multiarch",
+            "miDebuggerServerAddress": "localhost:3333",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        }
+    ]
+}

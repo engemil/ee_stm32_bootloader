@@ -1,0 +1,13 @@
+[submodule "ext/ChibiOS"]
+	path = ext/ChibiOS
+	url = https://github.com/ChibiOS/ChibiOS.git
+[submodule "ext/ChibiOS_21.11.x"]
+	path = ext/ChibiOS_21.11.x
+	url = https://github.com/ChibiOS/ChibiOS.git
+	branch = stable_21.11.x
+[submodule "Unity"]
+	path = Unity
+	url = https://github.com/ThrowTheSwitch/Unity.git
+[submodule "CMock"]
+	path = CMock
+	url = https://github.com/ThrowTheSwitch/CMock

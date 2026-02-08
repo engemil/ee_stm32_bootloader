@@ -1,0 +1,21 @@
+# Build artifacts
+build/*
+*.o
+*.elf
+*.bin
+*.hex
+*.map
+*.d
+
+# Editor files
+*.swp
+*.swo
+*~
+.DS_Store
+
+# IDE files
+#.vscode/
+.idea/
+*.code-workspace
+
+.dep/*

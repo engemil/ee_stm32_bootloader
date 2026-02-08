@@ -1,0 +1,115 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Bootloader",
+            "type": "shell",
+            "command": "make",
+            "options": {
+                "cwd": "${workspaceFolder}/bootloader"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": true
+            }
+        },
+        {
+            "label": "Clean Bootloader",
+            "type": "shell",
+            "command": "make clean",
+            "options": {
+                "cwd": "${workspaceFolder}/bootloader"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Build Bootloader (DEBUG)",
+            "type": "shell",
+            "command": "make DEBUG=1",
+            "options": {
+                "cwd": "${workspaceFolder}/bootloader"
+            },
+            "group": "build",
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "Flash Bootloader (OpenOCD)",
+            "type": "shell",
+            "command": "sudo openocd -f interface/stlink.cfg -c \"transport select swd\" -f target/stm32c0x.cfg -c \"program build/bootloader.bin 0x08000000 verify reset exit\"",
+            "options": {
+                "cwd": "${workspaceFolder}/bootloader"
+            },
+            "problemMatcher": [],
+            "dependsOn": "Build Bootloader"
+        },
+        {
+            "label": "Flash Bootloader (st-flash)",
+            "type": "shell",
+            "command": "st-flash write build/bootloader.bin 0x08000000",
+            "options": {
+                "cwd": "${workspaceFolder}/bootloader"
+            },
+            "problemMatcher": [],
+            "dependsOn": "Build Bootloader"
+        },
+        {
+            "label": "Static Analysis (cppcheck) of Bootloader",
+            "type": "shell",
+            "command": "cppcheck --enable=all --std=c11 --suppress=missingIncludeSystem -I inc -I ../ext/ChibiOS/os/common/ext/ST/STM32C0xx -I ../ext/ChibiOS/os/common/ext/ARM/CMSIS/Core/Include -I ../ext/ChibiOS/os/hal/include -I ../ext/ChibiOS/os/hal/ports/STM32/STM32C0xx -I ../ext/ChibiOS/os/hal/ports/STM32/LLD/DMAv1 -I ../ext/ChibiOS/os/hal/ports/STM32/LLD/TIMv1 -I ../ext/ChibiOS/os/hal/ports/STM32/LLD/USBv1 -I ../ext/ChibiOS/os/rt/include src/",
+            "options": {
+                "cwd": "${workspaceFolder}/bootloader"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Check USB Device",
+            "type": "shell",
+            "command": "lsusb | grep 0483 && echo '---' && dfu-util -l",
+            "problemMatcher": [],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Show Memory Usage of Bootloader",
+            "type": "shell",
+            "command": "arm-none-eabi-size -A -d build/bootloader.elf",
+            "options": {
+                "cwd": "${workspaceFolder}/bootloader"
+            },
+            "problemMatcher": [],
+            "dependsOn": "Build Bootloader"
+        },
+        {
+            "label": "Rebuild Bootloader",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "Clean Bootloader",
+                "Build Bootloader"
+            ],
+            "problemMatcher": []
+        }
+    ]
+}

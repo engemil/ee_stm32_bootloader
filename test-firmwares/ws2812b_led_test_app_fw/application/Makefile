@@ -1,0 +1,231 @@
+##############################################################################
+# Build global options
+# NOTE: Can be overridden externally.
+#
+
+# Compiler options here.
+ifeq ($(USE_OPT),)
+  USE_OPT = -O2 -ggdb -fomit-frame-pointer -falign-functions=16
+endif
+
+# C specific options here (added to USE_OPT).
+ifeq ($(USE_COPT),)
+  USE_COPT = 
+endif
+
+# C++ specific options here (added to USE_OPT).
+ifeq ($(USE_CPPOPT),)
+  USE_CPPOPT = -fno-rtti
+endif
+
+# Enable this if you want the linker to remove unused code and data.
+ifeq ($(USE_LINK_GC),)
+  USE_LINK_GC = yes
+endif
+
+# Linker extra options here.
+ifeq ($(USE_LDOPT),)
+  USE_LDOPT = 
+endif
+
+# Enable this if you want link time optimizations (LTO).
+ifeq ($(USE_LTO),)
+  USE_LTO = yes
+endif
+
+# Enable this if you want to see the full log while compiling.
+ifeq ($(USE_VERBOSE_COMPILE),)
+  USE_VERBOSE_COMPILE = no
+endif
+
+# If enabled, this option makes the build process faster by not compiling
+# modules not used in the current configuration.
+ifeq ($(USE_SMART_BUILD),)
+  USE_SMART_BUILD = yes
+endif
+
+#
+# Build global options
+##############################################################################
+
+##############################################################################
+# Architecture or project specific options
+#
+
+# Stack size to be allocated to the Cortex-M process stack. This stack is
+# the stack used by the main() thread.
+ifeq ($(USE_PROCESS_STACKSIZE),)
+  USE_PROCESS_STACKSIZE = 0x400
+endif
+
+# Stack size to the allocated to the Cortex-M main/exceptions stack. This
+# stack is used for processing interrupts and exceptions.
+ifeq ($(USE_EXCEPTIONS_STACKSIZE),)
+  USE_EXCEPTIONS_STACKSIZE = 0x400
+endif
+
+# Enables the use of FPU (no, softfp, hard).
+ifeq ($(USE_FPU),)
+  USE_FPU = no
+endif
+
+# FPU-related options.
+ifeq ($(USE_FPU_OPT),)
+  USE_FPU_OPT = -mfloat-abi=$(USE_FPU) -mfpu=fpv4-sp-d16
+endif
+
+#
+# Architecture or project specific options
+##############################################################################
+
+##############################################################################
+# Project, target, sources and paths
+#
+
+# Define project name here
+PROJECT = ws2812b-led-test-app-fw
+
+# Target settings.
+MCU  = cortex-m0plus
+
+# Imported source files and paths.
+#CHIBIOS  := ./chibios
+CHIBIOS  := ../../../ext/ChibiOS
+CONFDIR  := ./cfg
+BUILDDIR := ./build
+DEPDIR   := ./.dep
+BOARDSDIR := ./boards
+
+# Licensing files.
+include $(CHIBIOS)/os/license/license.mk
+
+# Startup files.
+include $(CHIBIOS)/os/common/startup/ARMCMx/compilers/GCC/mk/startup_stm32c0xx.mk
+
+# HAL files (optional)
+include $(CHIBIOS)/os/hal/hal.mk
+include $(CHIBIOS)/os/hal/ports/STM32/STM32C0xx/platform.mk
+
+# Board files. Only uncomment one of the following lines, depending on the board you are using.
+#include $(CHIBIOS)/os/hal/boards/ST_NUCLEO64_C071RB/board.mk
+include $(BOARDSDIR)/CUSTOM_BOARD/board.mk
+#include $(BOARDSDIR)/ST_NUCLEO64_C071RB/board.mk
+
+# HAL-OSAL files (optional).
+include $(CHIBIOS)/os/hal/osal/rt-nil/osal.mk
+# RTOS files (optional).
+include $(CHIBIOS)/os/rt/rt.mk
+include $(CHIBIOS)/os/common/ports/ARMv6-M/compilers/GCC/mk/port.mk
+
+# Auto-build files in ./source recursively.
+include $(CHIBIOS)/tools/mk/autobuild.mk
+
+# Streams files (optional).
+include $(CHIBIOS)/os/hal/lib/streams/streams.mk
+
+# ChibiOS test files (optional).
+#include $(CHIBIOS)/os/test/test.mk
+#include $(CHIBIOS)/test/rt/rt_test.mk
+#include $(CHIBIOS)/test/oslib/oslib_test.mk
+
+# Project Libraries
+LIBS     := ./libs
+include $(LIBS)/libs.mk
+
+# Define linker script file here
+# ChibiOS provides a default linker script for STM32C0xx devices, but we use 
+#LDSCRIPT= $(STARTUPLD)/STM32C071xB.ld
+LDSCRIPT= STM32C071xB_bootloader.ld
+
+# C sources that can be compiled in ARM or THUMB mode depending on the global
+# setting.
+CSRC = $(ALLCSRC) \
+       $(TESTSRC) \
+       main.c \
+       app_header.c
+
+# C++ sources that can be compiled in ARM or THUMB mode depending on the global
+# setting.
+CPPSRC = $(ALLCPPSRC)
+
+# List ASM source files here.
+ASMSRC = $(ALLASMSRC)
+
+# List ASM with preprocessor source files here.
+ASMXSRC = $(ALLXASMSRC)
+
+# Inclusion directories.
+INCDIR = $(CONFDIR) $(ALLINC) $(TESTINC)
+
+# Define C warning options here.
+CWARN = -Wall -Wextra -Wundef -Wstrict-prototypes -Wcast-align=strict
+
+# Define C++ warning options here.
+CPPWARN = -Wall -Wextra -Wundef
+
+#
+# Project, target, sources and paths
+##############################################################################
+
+##############################################################################
+# Start of user section
+#
+
+# List all user C define here, like -D_DEBUG=1
+UDEFS = -DCRT0_VTOR_INIT=1
+
+# Define ASM defines here
+UADEFS = -DCRT0_VTOR_INIT=1
+
+# List all user directories here
+UINCDIR =
+
+# List the user directory to look for the libraries here
+ULIBDIR =
+
+# List all user libraries here
+ULIBS =
+
+#
+# End of user section
+##############################################################################
+
+##############################################################################
+# Common rules
+#
+
+RULESPATH = $(CHIBIOS)/os/common/startup/ARMCMx/compilers/GCC/mk
+include $(RULESPATH)/arm-none-eabi.mk
+include $(RULESPATH)/rules.mk
+
+#
+# Common rules
+##############################################################################
+
+##############################################################################
+# Custom rules
+#
+
+# Path to patch script
+PATCH_SCRIPT = ../../../scripts/patch_app_header.py
+
+# Patch binary with size and CRC32 (runs automatically after build)
+POST_MAKE_ALL_RULE_HOOK: patch_firmware
+
+patch_firmware: $(BUILDDIR)/$(PROJECT).bin
+	@echo ""
+	@echo "=========================================="
+	@echo "Patching firmware with size and CRC32..."
+	@echo "=========================================="
+	@python3 $(PATCH_SCRIPT) $(BUILDDIR)/$(PROJECT).bin $(BUILDDIR)/$(PROJECT)_patched.bin
+	@echo ""
+	@echo "✓ Build and patch complete!"
+	@echo "  Unpatched: $(BUILDDIR)/$(PROJECT).bin (do not upload)"
+	@echo "  Patched:   $(BUILDDIR)/$(PROJECT)_patched.bin (ready to upload)"
+	@echo ""
+
+.PHONY: patch_firmware
+
+#
+# Custom rules
+##############################################################################

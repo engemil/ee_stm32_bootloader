@@ -1,0 +1,63 @@
+{
+    "C_Cpp.default.defines": [
+        "STM32C071xx",
+        "USE_HAL_DRIVER",
+        "__ARM_ARCH_6M__"
+    ],
+    "C_Cpp.default.includePath": [
+        "${workspaceFolder}/bootloader/inc",
+        "${workspaceFolder}/ext/ChibiOS/os/common/ext/ST/STM32C0xx",
+        "${workspaceFolder}/ext/ChibiOS/os/common/ext/ARM/CMSIS/Core/Include",
+        "${workspaceFolder}/ext/ChibiOS/os/common/portability/GCC",
+        "${workspaceFolder}/ext/ChibiOS/os/common/startup/ARMCMx/compilers/GCC",
+        "${workspaceFolder}/ext/ChibiOS/os/common/startup/ARMCMx/devices/STM32C0xx",
+        "${workspaceFolder}/ext/ChibiOS/os/rt/include",
+        "${workspaceFolder}/ext/ChibiOS/os/common/oslib/include",
+        "${workspaceFolder}/ext/ChibiOS/os/hal/include",
+        "${workspaceFolder}/ext/ChibiOS/os/hal/ports/common/ARMCMx",
+        "${workspaceFolder}/ext/ChibiOS/os/hal/ports/STM32/STM32C0xx",
+        "${workspaceFolder}/ext/ChibiOS/os/hal/ports/STM32/LLD/DMAv1",
+        "${workspaceFolder}/ext/ChibiOS/os/hal/ports/STM32/LLD/GPIOv2",
+        "${workspaceFolder}/ext/ChibiOS/os/hal/ports/STM32/LLD/RCCv1",
+        "${workspaceFolder}/ext/ChibiOS/os/hal/ports/STM32/LLD/TIMv1",
+        "${workspaceFolder}/ext/ChibiOS/os/hal/ports/STM32/LLD/USBv1"
+    ],
+    "C_Cpp.default.compilerPath": "/usr/bin/arm-none-eabi-gcc",
+    "C_Cpp.default.cStandard": "c11",
+    "C_Cpp.default.cppStandard": "c++17",
+    "C_Cpp.default.intelliSenseMode": "gcc-arm",
+    "C_Cpp.errorSquiggles": "enabled",
+    "files.associations": {
+        "*.h": "c",
+        "*.c": "c",
+        "*.ld": "linkerscript",
+        "config.h": "c",
+        "bootloader.h": "c",
+        "flash_ops.h": "c",
+        "crc32.h": "c",
+        "usb_dfu.h": "c",
+        "chconf.h": "c",
+        "halconf.h": "c",
+        "mcuconf.h": "c"
+    },
+    "files.exclude": {
+        "**/*.o": true,
+        "**/*.d": true,
+        "**/*.map": true,
+        "**/build/*.elf": false,
+        "**/build/*.bin": false,
+        "**/build/*.hex": false
+    },
+    "search.exclude": {
+        "**/build": true,
+        "**/.git": true
+    },
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false,
+    "editor.rulers": [
+        100
+    ],
+    "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: LLVM, IndentWidth: 4, ColumnLimit: 100, BreakBeforeBraces: Linux }",
+    "cmake.sourceDirectory": "/home/engemil/Repositories/ee_stm32_bootloader/ext/Unity"
+}

@@ -1,0 +1,63 @@
+# ChibiOS Makefile Snippet for Bootloader Integration
+# Copy these changes to your ChibiOS project Makefile
+
+# ==============================================================================
+# STEP 1: Change linker script (around line 124)
+# ==============================================================================
+
+# BEFORE:
+# LDSCRIPT= $(STARTUPLD)/STM32C071xB.ld
+
+# AFTER:
+LDSCRIPT= STM32C071xB_bootloader.ld
+
+
+# ==============================================================================
+# STEP 2: Add app_header.c to sources (around line 128)
+# ==============================================================================
+
+# BEFORE:
+# CSRC = $(ALLCSRC) \
+#        $(TESTSRC) \
+#        main.c
+
+# AFTER:
+CSRC = $(ALLCSRC) \
+       $(TESTSRC) \
+       main.c \
+       app_header.c
+
+
+# ==============================================================================
+# STEP 3: Add automatic patching (at end of Makefile, in Custom rules section)
+# ==============================================================================
+
+# Path to patch script (adjust based on your project location)
+PATCH_SCRIPT = ../../../scripts/patch_app_header.py
+
+# Automatic post-build patching
+POST_MAKE_ALL_RULE_HOOK: patch_firmware
+
+patch_firmware: $(BUILDDIR)/$(PROJECT).bin
+	@echo ""
+	@echo "=========================================="
+	@echo "Patching firmware with size and CRC32..."
+	@echo "=========================================="
+	@python3 $(PATCH_SCRIPT) $(BUILDDIR)/$(PROJECT).bin $(BUILDDIR)/$(PROJECT)_patched.bin
+	@echo ""
+	@echo "✓ Build and patch complete!"
+	@echo "  Unpatched: $(BUILDDIR)/$(PROJECT).bin (do not upload)"
+	@echo "  Patched:   $(BUILDDIR)/$(PROJECT)_patched.bin (ready to upload)"
+	@echo ""
+
+.PHONY: patch_firmware
+
+
+# ==============================================================================
+# STEP 4: Add app_header.h include to main.c
+# ==============================================================================
+
+# Add this line to your main.c includes:
+# #include "app_header.h"
+
+# That's it! Run 'make' and it will automatically patch the firmware.
