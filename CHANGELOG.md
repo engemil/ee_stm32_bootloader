@@ -11,6 +11,12 @@ All notable changes to the EngEmil STM32 Bootloader project will be documented i
 
 ---
 
+## [1.1.1] - (2026-02-11)
+
+Changed
+- Renamed post-compile script "patch" to "signed".
+- Replaced `sign_app_header`-script from python to bash. Removing python as a dependency.
+
 
 ## [1.1.0] - (2026-02-11)
 

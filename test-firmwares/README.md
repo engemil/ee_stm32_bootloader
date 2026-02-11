@@ -24,7 +24,7 @@ Test application firmware(s) and template.
 **Contents:**
 - Application header files (app_header.h/c)
 - ChibiOS bootloader-compatible linker script
-- Makefile snippet with auto-patching
+- Makefile snippet with auto-signing
 - Quick reference guide (README.md)
 
 **Use the template to integrate your own firmware with the bootloader.**
@@ -46,7 +46,7 @@ cd led_test_app_fw/application && make clean && make
 
 # Upload application firmware over USB
 cd test-firmwares/led_test_app_fw/application
-sudo dfu-util -a 0 --dfuse-address 0x08004000:leave -D build/led-test-app-fw_patched.bin
+sudo dfu-util -a 0 --dfuse-address 0x08004000:leave -D build/led-test-app-fw_signed.bin
 ```
 
 
@@ -97,4 +97,4 @@ void enter_bootloader(void) {
 Test firmware uses:
 - **Toolchain:** ARM GCC (`arm-none-eabi-gcc`)
 - **Build Tool:** GNU Make
-- **CRC32 Patching:** `scripts/patch_app_header.py` (in workspace root)
+- **CRC32 Signing:** `scripts/sign_app_header.sh` (in workspace root)

@@ -29,28 +29,28 @@ CSRC = $(ALLCSRC) \
 
 
 # ==============================================================================
-# STEP 3: Add automatic patching (at end of Makefile, in Custom rules section)
+# STEP 3: Add automatic signing (at end of Makefile, in Custom rules section)
 # ==============================================================================
 
-# Path to patch script (adjust based on your project location)
-PATCH_SCRIPT = ../../../scripts/patch_app_header.py
+# Path to signing script (adjust based on your project location)
+SIGN_SCRIPT = ../../../scripts/sign_app_header.sh
 
-# Automatic post-build patching
-POST_MAKE_ALL_RULE_HOOK: patch_firmware
+# Automatic post-build signing
+POST_MAKE_ALL_RULE_HOOK: sign_firmware
 
-patch_firmware: $(BUILDDIR)/$(PROJECT).bin
+sign_firmware: $(BUILDDIR)/$(PROJECT).bin
 	@echo ""
 	@echo "=========================================="
-	@echo "Patching firmware with size and CRC32..."
+	@echo "Signing firmware with size and CRC32..."
 	@echo "=========================================="
-	@python3 $(PATCH_SCRIPT) $(BUILDDIR)/$(PROJECT).bin $(BUILDDIR)/$(PROJECT)_patched.bin
+    @bash $(SIGN_SCRIPT) $(BUILDDIR)/$(PROJECT).bin $(BUILDDIR)/$(PROJECT)_signed.bin
 	@echo ""
-	@echo "✓ Build and patch complete!"
-	@echo "  Unpatched: $(BUILDDIR)/$(PROJECT).bin (do not upload)"
-	@echo "  Patched:   $(BUILDDIR)/$(PROJECT)_patched.bin (ready to upload)"
+	@echo "✓ Build and signing complete!"
+	@echo "  Unsigned: $(BUILDDIR)/$(PROJECT).bin (do not upload)"
+	@echo "  Signed:   $(BUILDDIR)/$(PROJECT)_signed.bin (ready to upload)"
 	@echo ""
 
-.PHONY: patch_firmware
+.PHONY: sign_firmware
 
 
 # ==============================================================================
@@ -60,4 +60,4 @@ patch_firmware: $(BUILDDIR)/$(PROJECT).bin
 # Add this line to your main.c includes:
 # #include "app_header.h"
 
-# That's it! Run 'make' and it will automatically patch the firmware.
+# That's it! Run 'make' and it will automatically sign the firmware.

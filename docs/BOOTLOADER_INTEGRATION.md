@@ -28,7 +28,7 @@ To make your ChibiOS application bootloader-compatible, you need:
 
 1. **Application header** (32 bytes at 0x08004000)
 2. **Custom linker script** (places header and vectors correctly)
-3. **Build automation** (auto-patch CRC32 after compilation)
+3. **Build automation** (auto-sign CRC32 after compilation)
 
 ### Why?
 
@@ -47,8 +47,8 @@ The bootloader validates firmware before execution:
 │ 0x08004000 - 0x0800401F: App Header     │  32 bytes
 │   [0x00] magic:   0xDEADBEEF            │
 │   [0x04] version: 0xMMNNPPPP            │
-│   [0x08] size:    (auto-patched)        │
-│   [0x0C] crc32:   (auto-patched)        │
+│   [0x08] size:    (auto-signed)         │
+│   [0x0C] crc32:   (auto-signed)         │
 │   [0x10] reserved[4]                    │
 ├─────────────────────────────────────────┤
 │ 0x08004020 - 0x080040FF: Padding        │  224 bytes
@@ -118,7 +118,7 @@ CSRC = $(ALLCSRC) \
 ```
 
 
-#### Change 3: Add Auto-Patching (at end of Makefile)
+#### Change 3: Add Auto-Signing (at end of Makefile)
 
 Find the "Custom rules" section and add:
 
@@ -127,28 +127,28 @@ Find the "Custom rules" section and add:
 # Custom rules
 #
 
-# Path to patch script (adjust if needed)
-PATCH_SCRIPT = ../../../scripts/patch_app_header.py
+# Path to signing script (adjust if needed)
+SIGN_SCRIPT = ../../../scripts/sign_app_header.sh
 
-# Automatic firmware patching after build
-POST_MAKE_ALL_RULE_HOOK: patch_firmware
+# Automatic firmware signing after build
+POST_MAKE_ALL_RULE_HOOK: sign_firmware
 
-patch_firmware: $(BUILDDIR)/$(PROJECT).bin
+sign_firmware: $(BUILDDIR)/$(PROJECT).bin
 	@echo ""
 	@echo "=========================================="
-	@echo "Patching firmware with size and CRC32..."
+	@echo "Signing firmware with size and CRC32..."
 	@echo "=========================================="
-	@python3 $(PATCH_SCRIPT) $(BUILDDIR)/$(PROJECT).bin $(BUILDDIR)/$(PROJECT)_patched.bin
+	@python3 $(SIGN_SCRIPT) $(BUILDDIR)/$(PROJECT).bin $(BUILDDIR)/$(PROJECT)_signed.bin
 	@echo ""
 	@echo "✓ Build
-.PHONY: patch_firmware
+.PHONY: sign_firmware
 
 #
 # Custom rules
 ##############################################################################
 ```
 
-**Note:** Adjust `PATCH_SCRIPT` path based on your project location relative to `scripts/patch_app_header.py` in the workspace root.
+**Note:** Adjust `SIGN_SCRIPT` path based on your project location relative to `scripts/sign_app_header.sh` in the workspace root.
 
 ### Step 3: Update main.c
 
@@ -188,13 +188,13 @@ Linking build/your_project.elf
 Creating build/your_project.bin
 
 ==========================================
-Patching firmware with size and CRC32...
+Signing firmware with size and CRC32...
 ==========================================
 ============================================================
-Application Binary Patching Complete
+Application Binary Signing Complete
 ============================================================
 Input file:       build/your_project.bin
-Output file:      build/your_project_patched.bin
+Output file:      build/your_project_signed.bin
 Total size:       XXXXX bytes
 Firmware size:    XXXXX bytes
 Magic:            0xDEADBEEF
@@ -202,9 +202,9 @@ Version:          0x00010000 (1.0.0)
 CRC32:            0xXXXXXXXX
 ============================================================
 
-✓ Build and patch complete!
-  Unpatched: build/your_project.bin (do not upload)
-  Patched:   build/your_project_patched.bin (ready to upload)
+✓ Build and signing complete!
+  Unsigned: build/your_project.bin (do not upload)
+  Signed:   build/your_project_signed.bin (ready to upload)
 ```
 
 
@@ -230,7 +230,7 @@ Found DFU: [0483:df11] ver=0200, devnum=X, cfg=1, intf=0, path="X-X", alt=0, nam
 
 **Step 3: Upload firmware**
 ```bash
-sudo dfu-util -a 0 --dfuse-address 0x08004000:leave -D build/your_project_patched.bin
+sudo dfu-util -a 0 --dfuse-address 0x08004000:leave -D build/your_project_signed.bin
 ```
 
 The `:leave` suffix makes the device reset automatically after upload.
@@ -240,7 +240,7 @@ The `:leave` suffix makes the device reset automatically after upload.
 **For rapid development iterations:**
 ```bash
 sudo openocd -f interface/stlink.cfg -f target/stm32c0x.cfg \
-  -c "program build/your_project_patched.bin 0x08004000 verify reset exit"
+  -c "program build/your_project_signed.bin 0x08004000 verify reset exit"
 ```
 
 **With debugging session:**
@@ -327,7 +327,7 @@ By holder in the User button at power-up or a power-cycle, you can enter the boo
 
 **Verify header is present:**
 ```bash
-od -A x -t x4z -N 64 build/your_project_patched.bin
+od -A x -t x4z -N 64 build/your_project_signed.bin
 ```
 
 Expected output:
@@ -404,7 +404,7 @@ Bootloader not running. Solutions:
 **Bootloader rejects firmware (stays in DFU mode)**
 
 CRC32 validation failed. Solutions:
-- Verify you uploaded the **patched** binary (`.._patched.bin`)
+- Verify you uploaded the **signed** binary (`.._signed.bin`)
 - Check binary header with `od` command (see Verification section)
 - Rebuild: `make clean && make`
 

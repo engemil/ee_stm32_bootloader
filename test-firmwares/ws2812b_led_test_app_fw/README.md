@@ -23,13 +23,13 @@ cd test-firmwares/ws2812b_led_test_app_fw/application && make clean && make
 cd application && make clean && make
 ```
 
-**Note:** The build process automatically patches the firmware binary with:
+**Note:** The build process automatically signs the firmware binary with:
 - Firmware size (excluding 32-byte header)
 - CRC32 checksum (for bootloader validation)
 
 **Output files:**
-- `build/ws2812b-led-test-app-fw.bin` - Unpatched binary (do not upload)
-- `build/ws2812b-led-test-app-fw_patched.bin` - **Ready to upload** (includes CRC32)
+- `build/ws2812b-led-test-app-fw.bin` - Unsigned binary (do not upload)
+- `build/ws2812b-led-test-app-fw_signed.bin` - **Ready to upload** (includes CRC32)
 
-**Always upload the `_patched.bin` file!** The bootloader requires a valid CRC32 to execute the firmware.
+**Always upload the `_signed.bin` file!** The bootloader requires a valid CRC32 to execute the firmware.
 

@@ -36,7 +36,7 @@ A fully functional bootloader for STM32 microcontroller(s), featuring USB DFU (D
 sudo apt update
 sudo apt install git build-essential gcc-arm-none-eabi \
   binutils-arm-none-eabi libnewlib-arm-none-eabi \
-  python3 dfu-util -y
+  dfu-util -y
 
 # NB! We also need stlink-tools and openocd, but they are outdated on ubuntu 24.04.
 # see the .devcontainer/Dockerfile for how to install from source, or use docker container
@@ -74,7 +74,7 @@ lsusb | grep 0483:df11
 cd ../test-firmwares/led_test_app_fw/application && make clean && make
 
 # Upload test firmware
-sudo dfu-util -a 0 --dfuse-address 0x08004000:leave -D build/led-test-app-fw_patched.bin
+sudo dfu-util -a 0 --dfuse-address 0x08004000:leave -D build/led-test-app-fw_signed.bin
 ```
 
 See sections below for detailed instructions.
@@ -114,7 +114,7 @@ See sections below for detailed instructions.
 ├── ext/                         - External dependencies
 ├── scripts/                     - Build and utility scripts
 │   ├── system/                  - System related scripts for Ubuntu (Linux)
-│   └── patch_app_header.py      - Post-build script: calculate and patch firmware size/CRC32
+│   └── sign_app_header.sh       - Post-build script: calculate and sign firmware size/CRC32
 ├── test-firmwares/              - Test application firmwares for validation
 │   ├── led_test_app_fw/         - LED example
 │   ├── template/                - Ready-to-use integration template
@@ -200,23 +200,23 @@ lsusb | grep 0483:df11
 sudo dfu-util -l
 # Expected: Found DFU: [0483:df11] ... alt=0, name="@Internal Flash  /0x08004000/112*001Kg"
 
-# 3. Upload firmware (use _patched.bin file!)
-sudo dfu-util -a 0 --dfuse-address 0x08004000:leave -D test-firmwares/led_test_app_fw/application/build/led-test-app-fw_patched.bin
+# 3. Upload firmware (use _signed.bin file!)
+sudo dfu-util -a 0 --dfuse-address 0x08004000:leave -D test-firmwares/led_test_app_fw/application/build/led-test-app-fw_signed.bin
 # Expected: Erase done, Download done, File downloaded successfully
 
 # 4. Device automatically resets and runs application
 ```
 
-**Important: Patched vs. Unpatched Binaries**
+**Important: Signed vs. Unsigned Binaries**
 
-Applications must be **patched** before upload to include valid size and CRC32 fields:
+Applications must be **signed** before upload to include valid size and CRC32 fields:
 
-- **`test-app.bin`** (unpatched) - Raw compiler output with zeros in size/CRC32 fields → **WILL NOT BOOT** ❌
-- **`test-app_patched.bin`** (patched) - Processed with valid size/CRC32 → **READY TO USE** ✅
+- **`test-app.bin`** (unsigned) - Raw compiler output with zeros in size/CRC32 fields → **WILL NOT BOOT** ❌
+- **`test-app_signed.bin`** (signed) - Processed with valid size/CRC32 → **READY TO USE** ✅
 
-The build system automatically generates both files. The `patch_app_header.py` script calculates the firmware size and CRC32 checksum after compilation and writes them into the application header. The bootloader validates these fields before jumping to the application.
+The build system automatically generates both files. The `sign_app_header.sh` script calculates the firmware size and CRC32 checksum after compilation and writes them into the application header. The bootloader validates these fields before jumping to the application.
 
-**Always use the `_patched.bin` file for DFU uploads!**
+**Always use the `_signed.bin` file for DFU uploads!**
 
 Test application firmwares are available to be built in the `test-firmwares/` directory.
 

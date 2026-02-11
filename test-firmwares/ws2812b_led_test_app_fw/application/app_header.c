@@ -9,8 +9,8 @@
  * - Validates firmware size
  * - Verifies CRC32 checksum
  * 
- * The size and crc32 fields are automatically patched by the
- * patch_app_header.py script during the build process.
+ * The size and crc32 fields are automatically signed by the
+ * sign_app_header script during the build process.
  */
 
 #include "app_header.h"
@@ -21,7 +21,7 @@ __attribute__((used))
 const app_header_t app_header = {
     .magic = APP_HEADER_MAGIC,      /* 0xDEADBEEF */
     .version = APP_VERSION,          /* 0x00010000 (v1.0.0) */
-    .size = 0,                       /* Patched by build script */
-    .crc32 = 0,                      /* Patched by build script */
+    .size = 0,                       /* Signed by build script */
+    .crc32 = 0,                      /* Signed by build script */
     .reserved = {0, 0, 0, 0}
 };

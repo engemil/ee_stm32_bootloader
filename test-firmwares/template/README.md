@@ -18,8 +18,8 @@ cp STM32C071xB_bootloader.ld your_project/
 Open `Makefile.snippet` and apply the 4 changes to your project's Makefile:
 - Change linker script to `STM32C071xB_bootloader.ld`
 - Add `app_header.c` to `CSRC`
-- Add post-build patching rules
-- Adjust `PATCH_SCRIPT` path if needed (include also the script `scripts/patch_app_header.py`)
+- Add post-build signing rules
+- Adjust `SIGN_SCRIPT` path if needed (include also the script `scripts/sign_app_header.sh`)
 
 ### 3. Update Your main.c
 
@@ -36,20 +36,20 @@ make
 ```
 
 Output files:
-- `build/your_project.bin` - Unpatched (do not upload)
-- `build/your_project_patched.bin` - **Upload this one!**
+- `build/your_project.bin` - Unsigned (do not upload)
+- `build/your_project_signed.bin` - **Upload this one!**
 
 ## Upload Firmware
 
 ### Via DFU Bootloader (Production)
 ```bash
-sudo dfu-util -a 0 --dfuse-address 0x08004000:leave -D build/your_project_patched.bin
+sudo dfu-util -a 0 --dfuse-address 0x08004000:leave -D build/your_project_signed.bin
 ```
 
 ### Via OpenOCD (Development)
 ```bash
 sudo openocd -f interface/stlink.cfg -f target/stm32c0x.cfg \
-  -c "program build/your_project_patched.bin 0x08004000 verify reset exit"
+  -c "program build/your_project_signed.bin 0x08004000 verify reset exit"
 ```
 
 ## File Descriptions
@@ -58,7 +58,7 @@ sudo openocd -f interface/stlink.cfg -f target/stm32c0x.cfg \
 Header file defining the bootloader-required structure. Customize `APP_VERSION` as needed.
 
 ### app_header.c
-Implementation that places the header at 0x08004000. The `size` and `crc32` fields are auto-patched during build.
+Implementation that places the header at 0x08004000. The `size` and `crc32` fields are auto-signed during build.
 
 ### STM32C071xB_bootloader.ld
 Complete ChibiOS-compatible linker script with:

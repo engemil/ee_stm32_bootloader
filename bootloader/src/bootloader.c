@@ -7,7 +7,7 @@
 #include "ch.h"
 #include "hal.h"
 
-#define BOOTLOADER_VERSION  0x00010100  /* Version 1.1.0 */
+#define BOOTLOADER_VERSION  0x00010101  /* Version 1.1.1 */
 
 static bootloader_state_t state = BOOTLOADER_STATE_IDLE;
 static systime_t timeout_start = 0;

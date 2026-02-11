@@ -202,25 +202,25 @@ include $(RULESPATH)/rules.mk
 # Custom rules
 #
 
-# Path to patch script
-PATCH_SCRIPT = ../../../scripts/patch_app_header.py
+# Path to signing script
+SIGN_SCRIPT = ../../../scripts/sign_app_header.sh
 
-# Patch binary with size and CRC32 (runs automatically after build)
-POST_MAKE_ALL_RULE_HOOK: patch_firmware
+# Sign binary with size and CRC32 (runs automatically after build)
+POST_MAKE_ALL_RULE_HOOK: sign_firmware
 
-patch_firmware: $(BUILDDIR)/$(PROJECT).bin
+sign_firmware: $(BUILDDIR)/$(PROJECT).bin
 	@echo ""
 	@echo "=========================================="
-	@echo "Patching firmware with size and CRC32..."
+	@echo "Signing firmware with size and CRC32..."
 	@echo "=========================================="
-	@python3 $(PATCH_SCRIPT) $(BUILDDIR)/$(PROJECT).bin $(BUILDDIR)/$(PROJECT)_patched.bin
+	@bash $(SIGN_SCRIPT) $(BUILDDIR)/$(PROJECT).bin $(BUILDDIR)/$(PROJECT)_signed.bin
 	@echo ""
-	@echo "✓ Build and patch complete!"
-	@echo "  Unpatched: $(BUILDDIR)/$(PROJECT).bin (do not upload)"
-	@echo "  Patched:   $(BUILDDIR)/$(PROJECT)_patched.bin (ready to upload)"
+	@echo "✓ Build and signing complete!"
+	@echo "  Unsigned: $(BUILDDIR)/$(PROJECT).bin (do not upload)"
+	@echo "  Signed:   $(BUILDDIR)/$(PROJECT)_signed.bin (ready to upload)"
 	@echo ""
 
-.PHONY: patch_firmware
+.PHONY: sign_firmware
 
 #
 # Custom rules
