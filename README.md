@@ -1,7 +1,5 @@
 # EngEmil STM32 Bootloader (ee_stm32_bootloader)
 
-**Version:** 1.0.0
-
 A fully functional bootloader for STM32 microcontroller(s), featuring USB DFU (Device Firmware Upgrade), CRC32 firmware validation, safe flash programming, and multiple bootloader entry conditions. Built on ChibiOS framework, for the USB stack, RTOS kernel, and HAL layer.
 
 **Supported chip(s):** `STM32C071RB`
