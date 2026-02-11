@@ -53,6 +53,7 @@ static struct {
 /* USB Descriptors                                                           */
 /*===========================================================================*/
 
+/* TO DO: Change VID (idVendor) and PID (idProduct) for a valid VID and PID number */
 /**
  * @brief Device Descriptor
  * VID: 0x0483 (STMicroelectronics)
@@ -130,20 +131,18 @@ static const uint8_t vcom_string0[] = {
 };
 
 static const uint8_t vcom_string1[] = {
-    USB_DESC_BYTE(38),                      /* bLength                      */
+    USB_DESC_BYTE(22),                      /* bLength (2 + 10*2)           */
     USB_DESC_BYTE(USB_DESCRIPTOR_STRING),   /* bDescriptorType              */
-    'S', 0, 'T', 0, 'M', 0, 'i', 0, 'c', 0, 'r', 0, 'o', 0, 'e', 0,
-    'l', 0, 'e', 0, 'c', 0, 't', 0, 'r', 0, 'o', 0, 'n', 0, 'i', 0,
-    'c', 0, 's', 0
+    'E', 0, 'n', 0, 'g', 0, 'E', 0, 'm', 0, 'i', 0, 'l', 0, '.', 0,
+    'i', 0, 'o', 0
 };
 
 static const uint8_t vcom_string2[] = {
-    USB_DESC_BYTE(56),                      /* bLength                      */
+    USB_DESC_BYTE(40),                      /* bLength (2 + 19*2)           */
     USB_DESC_BYTE(USB_DESCRIPTOR_STRING),   /* bDescriptorType              */
-    'S', 0, 'T', 0, 'M', 0, '3', 0, '2', 0, ' ', 0, 'B', 0, 'o', 0,
-    'o', 0, 't', 0, 'l', 0, 'o', 0, 'a', 0, 'd', 0, 'e', 0, 'r', 0,
-    ' ', 0, 'D', 0, 'F', 0, 'U', 0, ' ', 0, 'M', 0, 'o', 0, 'd', 0,
-    'e', 0
+    'B', 0, 'o', 0, 'o', 0, 't', 0, 'l', 0, 'o', 0, 'a', 0, 'd', 0,
+    'e', 0, 'r', 0, ' ', 0, 'D', 0, 'F', 0, 'U', 0, ' ', 0, 'M', 0,
+    'o', 0, 'd', 0, 'e', 0
 };
 
 static const uint8_t vcom_string3[] = {
@@ -156,7 +155,7 @@ static const uint8_t vcom_string3[] = {
 /* DFUSe interface string descriptor */
 /* Format: @Internal Flash  /0x08004000/112*001Kg */
 static const uint8_t vcom_string4[] = {
-    USB_DESC_BYTE(82),                      /* bLength (2 + 40*2)           */
+    USB_DESC_BYTE(78),                      /* bLength (2 + 38*2)           */
     USB_DESC_BYTE(USB_DESCRIPTOR_STRING),   /* bDescriptorType              */
     '@', 0, 'I', 0, 'n', 0, 't', 0, 'e', 0, 'r', 0, 'n', 0, 'a', 0,
     'l', 0, ' ', 0, 'F', 0, 'l', 0, 'a', 0, 's', 0, 'h', 0, ' ', 0,

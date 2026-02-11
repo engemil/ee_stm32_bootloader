@@ -9,7 +9,16 @@ All notable changes to the EngEmil STM32 Bootloader project will be documented i
 
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
 ---
+
+## [1.1.2] - (2026-02-11)
+
+Added
+- Added a "To Do", to change VID and PID for USB. Not yet clearified if `0483:df11` can be used.
+
+Changed
+- Changed USB Descriptor to show: `EngEmil.io Bootloader DFU Mode`
 
 ## [1.1.1] - (2026-02-11)
 
@@ -33,7 +42,7 @@ Changed
 
 Added
 - **USB DFU 1.1 Protocol** with full compliance
-  - VID:PID 0x0483:0xDF11 (STMicroelectronics DFU mode)
+  - VID:PID 0x0483:0xDF11 (STMicroelectronics DFU mode) (Must be changed later)
   - Transfer size: 1024 bytes per block
 - **DFUSe Extensions** (ST-specific)
   - Set Address Pointer (0x21) for non-sequential writes
