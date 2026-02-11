@@ -22,7 +22,7 @@
  * 1. Magic value in RAM (set by application for firmware update)
  * 2. Invalid application firmware (CRC check fails)
  * 3. User button pressed during reset
- * 4. Watchdog reset detected
+ * 4. Watchdog reset detected (commented out until watchdog implemented)
  */
 int main(void) {
     int result;

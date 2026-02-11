@@ -14,8 +14,8 @@ A fully functional bootloader for STM32 microcontroller(s), featuring USB DFU (D
 - **Safe Flash Operations** - 64-bit double-word writes (STM32C0 compliant).
 - **Bootloader Auto-jump Timeout** - Automatically jumps to application after timeout period if inactive in bootloader.
 - **Bootloader Protection** - Address validation prevents self-overwrite.
-- **Multiple Entry Modes** - Magic RAM value (enter from application), invalid firmware detection, watchdog reset detection.
-- **Vector Table Relocation** - Automatic SCB->VTOR setup (applications must not set it). (TO DO: I need to understand this more)
+- **Multiple Entry Modes** - Magic RAM value (enter from application), invalid firmware detection, user button. <!-- , watchdog reset detection. -->
+- **Vector Table Relocation** - Bootloader automaticly selects the correct interrupt vector table. Two vector tables (bootloader and application).
 - **ChibiOS RTOS** - Master branch for USB stack.
 - **Crystal-less USB** - HSI48 internal oscillator with CRS.
 - **Zero Warnings** - Compiles with `-Werror`, cppcheck clean.
@@ -60,7 +60,7 @@ See `ext/README.md` for detailed submodule management.
 
 ```bash
 # Build bootloader
-cd bootloader && make
+cd bootloader && make clean && make
 # Flash to device over debugger (the first stlink it sees)
 st-flash --reset write build/bootloader.bin 0x08000000
 # Verify entered USB DFU mode
@@ -71,7 +71,7 @@ lsusb | grep 0483:df11
 ```bash
 
 # Upload application firmware over USB
-cd ../test-firmwares/led_test_app_fw/application && make
+cd ../test-firmwares/led_test_app_fw/application && make clean && make
 
 # Upload test firmware
 sudo dfu-util -a 0 --dfuse-address 0x08004000:leave -D build/led-test-app-fw_patched.bin
@@ -185,7 +185,7 @@ st-flash --reset --serial 0040003D3739541678553432 write build/bootloader.bin 0x
 The bootloader automatically enters USB DFU mode if:
 1. **No valid application** detected (magic `0xDEADBEEF` missing or CRC32 mismatch)
 2. **Magic RAM value** present (application writes `0xDEADBEEF` to `0x20005FFC` and resets)
-3. **Watchdog reset** detected (`RCC->CSR2` `IWDGRSTF` flag - STM32C0 specific register)
+<!-- 3. **Watchdog reset** detected (`RCC->CSR2` `IWDGRSTF` flag - STM32C0 specific register) -->
 
 ### Uploading Firmware via DFU
 
@@ -270,7 +270,7 @@ Applications must:
    
    Note: 256-byte padding (0x08004020-0x080040FF) required for ARM Cortex-M0+ vector table alignment.
 
-4. **NOT set SCB->VTOR** (bootloader handles this) (TO DO: Clearify tiny bit more what this is and why)
+4. **Do NOT set SCB->VTOR** (memory address for the interrupt vector table). The bootloader handles this, application MUST NOT do it! The system will have two interrupt vector tables, one for bootloader and one for application. However, as stated the bootloader will control which one is active.
 
 
 ## Memory Layout

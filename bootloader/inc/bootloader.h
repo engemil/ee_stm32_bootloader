@@ -42,7 +42,7 @@ int bootloader_init(void);
  * - Magic value in RAM
  * - Invalid application firmware
  * - User button pressed
- * - Watchdog reset
+ * - Watchdog reset (commented out until watchdog implemented)
  * 
  * @return true if bootloader should run, false otherwise
  */

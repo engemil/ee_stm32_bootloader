@@ -37,8 +37,7 @@ Test application firmware(s) and template.
 
 ### Build Test Firmware
 ```bash
-cd led_test_app_fw/application
-make
+cd led_test_app_fw/application && make clean && make
 ```
 
 ### Upload via USB DFU (Bootloader)

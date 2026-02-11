@@ -11,6 +11,18 @@ All notable changes to the EngEmil STM32 Bootloader project will be documented i
 
 ---
 
+
+## [1.1.0] - (2026-02-11)
+
+Added
+- **Custom board file** to bootloader.
+- New **Bootloader entry mode**: User button at start-up/power-cycle (was not yet implemented).
+
+Changed
+- Removed **Bootloader entry mode**: Watchdog reset detection removed/commented out (for now).
+- Adjusted information in Markdown files.
+
+
 ## [1.0.0] - (2026-02-08)
 
 Added

@@ -92,6 +92,7 @@ CHIBIOS  := ../ext/ChibiOS_21.11.x
 CONFDIR  := ./inc
 BUILDDIR := ./build
 DEPDIR   := ./.dep
+BOARDSDIR := ./boards
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
@@ -100,7 +101,12 @@ include $(CHIBIOS)/os/common/startup/ARMCMx/compilers/GCC/mk/startup_stm32c0xx.m
 # HAL-OSAL files (optional).
 include $(CHIBIOS)/os/hal/hal.mk
 include $(CHIBIOS)/os/hal/ports/STM32/STM32C0xx/platform.mk
-include $(CHIBIOS)/os/hal/boards/ST_NUCLEO64_C071RB/board.mk
+
+# Board files. Only uncomment one of the following lines, depending on the board you are using.
+#include $(CHIBIOS)/os/hal/boards/ST_NUCLEO64_C071RB/board.mk
+include $(BOARDSDIR)/CUSTOM_BOARD/board.mk
+#include $(BOARDSDIR)/ST_NUCLEO64_C071RB/board.mk
+
 include $(CHIBIOS)/os/hal/osal/rt-nil/osal.mk
 # RTOS files (optional).
 include $(CHIBIOS)/os/rt/rt.mk

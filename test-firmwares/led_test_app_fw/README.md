@@ -13,11 +13,9 @@ LED test application firmware for validating the EngEmil STM32 Bootloader functi
 ## Build Instructions
 
 ```bash
-cd test-firmwares/led_test_app_fw/application
+cd test-firmwares/led_test_app_fw/application && make clean && make
 # or
-cd application
-make clean              # Clean (previous) build artifacts
-make                    # Build and auto-patch test application
+cd application && make clean && make
 ```
 
 **Note:** The build process automatically patches the firmware binary with:

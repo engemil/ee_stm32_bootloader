@@ -5,8 +5,9 @@
 #include "usb_dfu.h"
 #include "stm32c071xx.h"
 #include "ch.h"
+#include "hal.h"
 
-#define BOOTLOADER_VERSION  0x00010000  /* Version 1.0.0 */
+#define BOOTLOADER_VERSION  0x00010100  /* Version 1.1.0 */
 
 static bootloader_state_t state = BOOTLOADER_STATE_IDLE;
 static systime_t timeout_start = 0;
@@ -17,10 +18,9 @@ static bool timeout_enabled = false;
  */
 int bootloader_init(void)
 {
-    /* TODO: Initialize clocks (HSI48 for USB) */
-    /* TODO: Initialize GPIO for LED and button */
-    /* TODO: Initialize USB DFU */
-    
+    // clocks (HSI48 for USB) initialized by ChibiOS startup code
+    // USB peripheral will be initialized by USB DFU code when needed
+
     state = BOOTLOADER_STATE_IDLE;
     
     return ERR_SUCCESS;
@@ -44,13 +44,19 @@ bool bootloader_should_enter(void)
         return true;  /* No valid application, stay in bootloader */
     }
     
-    /* TODO: Check if user button is pressed */
-    
-    /* TODO: Check for watchdog reset */
-    if (RCC->CSR2 & RCC_CSR2_IWDGRSTF) {
-        /* Watchdog reset - enter bootloader */
-        return true;
+    /* Check if user button is pressed (active low - externally pulled up) */
+    if (palReadLine(LINE_USER_BUTTON) == PAL_LOW) {
+        return true;  /* User button held during reset, enter bootloader */
     }
+    
+    
+    /* TODO: Implement, when watchdog is implemented */
+    //if (RCC->CSR2 & RCC_CSR2_IWDGRSTF) {
+    //    /* Clear watchdog reset flag to prevent false triggers on next boot */
+    //    RCC->CSR2 |= RCC_CSR2_IWDGRSTF;
+    //    /* Watchdog reset - enter bootloader */
+    //    return true;
+    //}
     
     return false;  /* Application is valid, jump to it */
 }

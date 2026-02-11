@@ -312,6 +312,13 @@ Bootloader detects invalid/missing firmware and stays in DFU mode.
 
 **NB!** If you wipe the bootloader, just flash it again.
 
+### Method 3: User Button
+
+By holder in the User button at power-up or a power-cycle, you can enter the bootloader and stays in DFU mode.
+
+- Disconnect the USB cable (power). Hold in the User button while you reconnect the USB cable, and release.
+- Hold in the User button as you press the reset button (with a pin), and release.
+
 
 
 ## Verification
@@ -424,7 +431,8 @@ PC should be in application range (0x08004000+).
 
 Did you set `SCB->VTOR` manually? **Don't!** ChibiOS HAL sets this automatically based on the linker script. Remove any manual `SCB->VTOR` assignments.
 
+<!-- 
 **Watchdog resets entering bootloader unexpectedly**
 
 This is intentional! If your application's watchdog times out, the bootloader detects it and enters DFU mode for recovery. This prevents brick scenarios.
-
+-->
