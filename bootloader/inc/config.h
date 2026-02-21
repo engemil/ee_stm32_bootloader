@@ -46,6 +46,10 @@ SOFTWARE.
 /* USB Configuration */
 #define USB_PACKET_SIZE         64
 
+/* Default USB VID/PID (used when no valid application is present) */
+#define USB_DEFAULT_VID         0x0483  /* STMicroelectronics */
+#define USB_DEFAULT_PID         0xDF11  /* DFU mode */
+
 /* Bootloader Entry Conditions */
 #define BOOTLOADER_MAGIC        0xDEADBEEF
 #define BOOTLOADER_MAGIC_ADDR   (RAM_BASE + RAM_SIZE - 4)

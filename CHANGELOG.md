@@ -12,6 +12,14 @@ All notable changes to the EngEmil STM32 Bootloader project will be documented i
 
 ---
 
+## [1.2.0] - (2026-02-21)
+
+Added
+- USB PID and VID values linked to application header.
+- Default USB PID and VID values.
+- Changed USB descriptor.
+
+
 ## [1.1.2] - (2026-02-11)
 
 Added

@@ -38,5 +38,7 @@ const app_header_t app_header = {
     .version = APP_VERSION,
     .size = 0,                       /* Auto-signed by build script */
     .crc32 = 0,                      /* Auto-signed by build script */
-    .reserved = {0, 0, 0, 0}
+    .usb_vid = USB_VID,              /* USB Vendor ID for bootloader */
+    .usb_pid = USB_PID,              /* USB Product ID for bootloader */
+    .reserved = {0, 0, 0}
 };

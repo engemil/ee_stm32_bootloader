@@ -33,13 +33,20 @@ SOFTWARE.
  * 
  * This header must be placed at the start of the application (0x08004000)
  * to enable firmware validation.
+ * 
+ * The usb_vid and usb_pid fields allow the application to specify USB
+ * identifiers that the bootloader will use in DFU mode. If no valid
+ * application is present (magic != 0xDEADBEEF), the bootloader falls
+ * back to default VID/PID values defined in config.h.
  */
 typedef struct __attribute__((packed)) {
     uint32_t magic;          /* Magic number: 0xDEADBEEF */
     uint32_t version;        /* Firmware version */
     uint32_t size;           /* Firmware size in bytes */
     uint32_t crc32;          /* CRC32 of firmware (excluding this header) */
-    uint32_t reserved[4];    /* Reserved for future use */
+    uint16_t usb_vid;        /* USB Vendor ID */
+    uint16_t usb_pid;        /* USB Product ID */
+    uint32_t reserved[3];    /* Reserved for future use */
 } app_header_t;
 
 /**

@@ -118,9 +118,7 @@ See sections below for detailed instructions.
 │   ├── template/                - Ready-to-use integration template
 │   ├── ws2812b_led_test_app_fw/ - WS2812B LED example
 │   └── README.md                - Information about test firmwares and template
-├── AGENTS.md                    - AI agent file
 ├── CHANGELOG.md                 - Version history and release notes
-├── opencode.json                - opencode AI agent file
 └── README.md                    - This file
 ```
 
@@ -252,9 +250,13 @@ Applications must:
        uint32_t version;    // Firmware version
        uint32_t size;       // Firmware size (bytes)
        uint32_t crc32;      // CRC32 checksum
-       uint32_t reserved[4];
+       uint16_t usb_vid;    // USB Vendor ID (used by bootloader DFU & app)
+       uint16_t usb_pid;    // USB Product ID (used by bootloader DFU & app)
+       uint32_t reserved[3];
    } app_header_t;
    ```
+   
+   **USB VID/PID:** When bootloader enters DFU mode, it reads VID/PID from the application header (if valid magic present). This allows the application to define its own USB identifiers that are used consistently in both DFU mode and normal operation. Default fallback: VID=0x0483 (STMicroelectronics), PID=0xDF11 (DFU).
 
 2. **Vector table at 0x08004100** (256-byte aligned, ARM Cortex-M0+ requirement)
 

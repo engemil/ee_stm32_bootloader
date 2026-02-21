@@ -49,7 +49,9 @@ The bootloader validates firmware before execution:
 │   [0x04] version: 0xMMNNPPPP            │
 │   [0x08] size:    (auto-signed)         │
 │   [0x0C] crc32:   (auto-signed)         │
-│   [0x10] reserved[4]                    │
+│   [0x10] usb_vid: USB Vendor ID         │
+│   [0x12] usb_pid: USB Product ID        │
+│   [0x14] reserved[3]                    │
 ├─────────────────────────────────────────┤
 │ 0x08004020 - 0x080040FF: Padding        │  224 bytes
 │   [Reserved for 256-byte alignment]     │
@@ -58,6 +60,8 @@ The bootloader validates firmware before execution:
 │   [Vectors + Code + Data]               │
 └─────────────────────────────────────────┘
 ```
+
+**USB VID/PID:** The bootloader reads VID/PID from the application header when entering DFU mode (if valid magic present). This allows the application to define its USB identifiers, used consistently in both DFU mode and normal CDC operation. Default fallback: VID=0x0483, PID=0xDF11.
 
 **Key Rules:**
 - ❌ **Never** write to 0x08000000-0x08003FFF (bootloader region)
@@ -333,7 +337,7 @@ od -A x -t x4z -N 64 build/your_project_signed.bin
 Expected output:
 ```
 000000 deadbeef 00010000 <size> <crc32>  >................<
-000010 00000000 00000000 00000000 00000000  >................<
+000010 <vid+pid> 00000000 00000000 00000000  >................<
 000020 20xxxxxx 08xxxxxx 08xxxxxx 08xxxxxx  > ...............<
 000030 08xxxxxx 08xxxxxx 08xxxxxx 08xxxxxx  >................<
 ```
@@ -343,6 +347,8 @@ Key points:
 - `0x04`: `0x00010000` (version 1.0.0)
 - `0x08`: Size in bytes (little-endian)
 - `0x0C`: CRC32 (little-endian)
+- `0x10`: USB VID (2 bytes, little-endian)
+- `0x12`: USB PID (2 bytes, little-endian)
 - `0x20`: Initial stack pointer (should be `0x20xxxxxx`)
 - `0x24`: Reset handler (should be `0x08xxxxxx`, odd address for Thumb mode)
 

@@ -77,20 +77,22 @@ static struct {
 /* USB Descriptors                                                           */
 /*===========================================================================*/
 
-/* TO DO: Change VID (idVendor) and PID (idProduct) for a valid VID and PID number */
 /**
- * @brief Device Descriptor
- * VID: 0x0483 (STMicroelectronics)
- * PID: 0xDF11 (DFU mode - standard for STM32 DFU)
+ * @brief Device Descriptor (mutable for dynamic VID/PID)
+ * 
+ * VID and PID are read from the application header if a valid application
+ * is present (magic == 0xDEADBEEF). Otherwise, defaults from config.h are used.
+ * 
+ * VID/PID are at byte offsets 8-9 (VID) and 10-11 (PID) in little-endian format.
  */
-static const uint8_t vcom_device_descriptor_data[18] = {
+static uint8_t vcom_device_descriptor_data[18] = {
     USB_DESC_DEVICE(0x0200,        /* bcdUSB (2.0)                    */
                     0x00,           /* bDeviceClass (per interface)    */
                     0x00,           /* bDeviceSubClass                 */
                     0x00,           /* bDeviceProtocol                 */
                     USB_PACKET_SIZE, /* bMaxPacketSize                 */
-                    0x0483,         /* idVendor (STMicroelectronics)   */
-                    0xDF11,         /* idProduct (DFU mode)            */
+                    USB_DEFAULT_VID, /* idVendor (patched at runtime)  */
+                    USB_DEFAULT_PID, /* idProduct (patched at runtime) */
                     0x0100,         /* bcdDevice                       */
                     1,              /* iManufacturer                   */
                     2,              /* iProduct                        */
@@ -101,10 +103,34 @@ static const uint8_t vcom_device_descriptor_data[18] = {
 /**
  * @brief Device Descriptor wrapper
  */
-static const USBDescriptor vcom_device_descriptor = {
+static USBDescriptor vcom_device_descriptor = {
     sizeof vcom_device_descriptor_data,
     vcom_device_descriptor_data
 };
+
+/**
+ * @brief Get USB VID/PID from application header or use defaults
+ * 
+ * If a valid application is present (magic == APP_HEADER_MAGIC), the VID/PID
+ * from the application header are returned. Otherwise, the default values
+ * from config.h are used.
+ * 
+ * @param[out] vid  Pointer to store USB Vendor ID
+ * @param[out] pid  Pointer to store USB Product ID
+ */
+static void get_usb_vid_pid(uint16_t *vid, uint16_t *pid) {
+    const app_header_t *header = (const app_header_t *)APP_BASE;
+    
+    if (header->magic == APP_HEADER_MAGIC) {
+        /* Valid application header - use its VID/PID */
+        *vid = header->usb_vid;
+        *pid = header->usb_pid;
+    } else {
+        /* No valid application - use defaults */
+        *vid = USB_DEFAULT_VID;
+        *pid = USB_DEFAULT_PID;
+    }
+}
 
 /**
  * @brief Configuration Descriptor with DFU Interface
@@ -466,6 +492,16 @@ int usb_dfu_init(void) {
     dfu_ctx.download_complete = false;
     dfu_ctx.erase_done = false;
     dfu_ctx.poll_timeout = 0;
+
+    /* Get VID/PID from application header (or use defaults) */
+    uint16_t vid, pid;
+    get_usb_vid_pid(&vid, &pid);
+    
+    /* Patch device descriptor with VID/PID (little-endian at offsets 8-11) */
+    vcom_device_descriptor_data[8]  = (uint8_t)(vid & 0xFF);
+    vcom_device_descriptor_data[9]  = (uint8_t)((vid >> 8) & 0xFF);
+    vcom_device_descriptor_data[10] = (uint8_t)(pid & 0xFF);
+    vcom_device_descriptor_data[11] = (uint8_t)((pid >> 8) & 0xFF);
 
     /* Initialize USB driver */
     usbDisconnectBus(&USBD1);
