@@ -46,7 +46,16 @@ SOFTWARE.
 /* USB Configuration */
 #define USB_PACKET_SIZE         64
 
-/* Default USB VID/PID (used when no valid application is present) */
+/* USB VID/PID Source Configuration
+ * When defined: Bootloader reads VID/PID from application header (if valid magic),
+ *               falling back to USB_DEFAULT_VID/PID if no valid application.
+ * When undefined: Always use USB_DEFAULT_VID and USB_DEFAULT_PID, ignoring
+ *                 any application header values.
+ */
+//#define USE_APP_HEADER_USB_IDS
+
+/* Default USB VID/PID (used when no valid application is present,
+ * or when USE_APP_HEADER_USB_IDS is not defined) */
 #define USB_DEFAULT_VID         0x0483  /* STMicroelectronics */
 #define USB_DEFAULT_PID         0xDF11  /* DFU mode */
 

@@ -111,14 +111,17 @@ static USBDescriptor vcom_device_descriptor = {
 /**
  * @brief Get USB VID/PID from application header or use defaults
  * 
- * If a valid application is present (magic == APP_HEADER_MAGIC), the VID/PID
- * from the application header are returned. Otherwise, the default values
- * from config.h are used.
+ * Behavior depends on USE_APP_HEADER_USB_IDS configuration:
+ * - When defined: If a valid application is present (magic == APP_HEADER_MAGIC),
+ *   the VID/PID from the application header are returned. Otherwise, the default
+ *   values from config.h are used.
+ * - When undefined: Returns USB_DEFAULT_VID and USB_DEFAULT_PID.
  * 
  * @param[out] vid  Pointer to store USB Vendor ID
  * @param[out] pid  Pointer to store USB Product ID
  */
 static void get_usb_vid_pid(uint16_t *vid, uint16_t *pid) {
+#ifdef USE_APP_HEADER_USB_IDS
     const app_header_t *header = (const app_header_t *)APP_BASE;
     
     if (header->magic == APP_HEADER_MAGIC) {
@@ -130,6 +133,12 @@ static void get_usb_vid_pid(uint16_t *vid, uint16_t *pid) {
         *vid = USB_DEFAULT_VID;
         *pid = USB_DEFAULT_PID;
     }
+#else
+    /* USE_APP_HEADER_USB_IDS not defined - Use defaults */
+    (void)APP_BASE;  /* Suppress unused warning */
+    *vid = USB_DEFAULT_VID;
+    *pid = USB_DEFAULT_PID;
+#endif
 }
 
 /**

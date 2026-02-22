@@ -257,6 +257,16 @@ Applications must:
    ```
    
    **USB VID/PID:** When bootloader enters DFU mode, it reads VID/PID from the application header (if valid magic present). This allows the application to define its own USB identifiers that are used consistently in both DFU mode and normal operation. Default fallback: VID=0x0483 (STMicroelectronics), PID=0xDF11 (DFU).
+   
+   This behavior is controlled by `USE_APP_HEADER_USB_IDS` in `bootloader/inc/config.h`:
+   - **Defined:** Read VID/PID from app header, fallback to defaults if invalid.
+   - **Undefined:** Always use `USB_DEFAULT_VID` and `USB_DEFAULT_PID`.
+
+    To use VID/PID from app header, uncomment this in `config.h`:
+    ```c
+    #define USE_APP_HEADER_USB_IDS
+    ```
+
 
 2. **Vector table at 0x08004100** (256-byte aligned, ARM Cortex-M0+ requirement)
 

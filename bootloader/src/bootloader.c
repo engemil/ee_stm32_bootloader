@@ -31,7 +31,7 @@ SOFTWARE.
 #include "ch.h"
 #include "hal.h"
 
-#define BOOTLOADER_VERSION  0x00010200  /* Version 1.2.0 */
+#define BOOTLOADER_VERSION 0x00010201  /* Version 1.2.1 */
 
 static bootloader_state_t state = BOOTLOADER_STATE_IDLE;
 static systime_t timeout_start = 0;

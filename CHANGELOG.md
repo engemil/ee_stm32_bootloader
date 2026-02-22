@@ -9,8 +9,17 @@ All notable changes to the EngEmil STM32 Bootloader project will be documented i
 
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+Note: Update `BOOTLOADER_VERSION` in `bootloader.c` when publishing new version.
 
 ---
+
+## [1.2.1] - (2026-02-22)
+
+Added
+- `USE_APP_HEADER_USB_IDS` macro to control USB VID/PID source behavior
+  - When defined: Read VID/PID from app header, fallback to defaults
+  - When undefined: Always use `USB_DEFAULT_VID` and `USB_DEFAULT_PID`
+
 
 ## [1.2.0] - (2026-02-21)
 

@@ -63,6 +63,18 @@ The bootloader validates firmware before execution:
 
 **USB VID/PID:** The bootloader reads VID/PID from the application header when entering DFU mode (if valid magic present). This allows the application to define its USB identifiers, used consistently in both DFU mode and normal CDC operation. Default fallback: VID=0x0483, PID=0xDF11.
 
+This behavior is configurable via `USE_APP_HEADER_USB_IDS` macro in `bootloader/inc/config.h`:
+
+| Macro State | Behavior |
+|-------------|----------|
+| **Defined** | Read VID/PID from app header if valid magic, otherwise use defaults |
+| **Undefined** (by default) | Always use `USB_DEFAULT_VID` (0x0483) and `USB_DEFAULT_PID` (0xDF11) |
+
+To use VID/PID from app header, uncomment this in `config.h`:
+```c
+#define USE_APP_HEADER_USB_IDS
+```
+
 **Key Rules:**
 - ❌ **Never** write to 0x08000000-0x08003FFF (bootloader region)
 - ✅ Application **must** start at 0x08004000
