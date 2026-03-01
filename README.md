@@ -139,9 +139,7 @@ make                    # Build bootloader (release, optimized for size with deb
 
 ### Method 1: OpenOCD (Recommended)
 ```bash
-sudo openocd -f interface/stlink.cfg \
-  -c "transport select swd" \
-  -f target/stm32c0x.cfg \
+openocd -f interface/stlink.cfg -f target/stm32c0x.cfg \
   -c "program build/bootloader.bin 0x08000000 verify reset exit"
 ```
 
@@ -150,12 +148,7 @@ sudo openocd -f interface/stlink.cfg \
 st-flash --reset write build/bootloader.bin 0x08000000
 ```
 
-### Method 3: VS Code
-1. Open bootloader project in VS Code
-2. Press `Ctrl+Shift+B` to build
-3. Run task: **Flash Bootloader (OpenOCD)** or **Flash Bootloader (st-flash)**
-
-**Note:** All approaches resets properly and enters into USB DFU mode automatically. If it does not work, try a power-cycle (press reset button or reconnect USB cable).
+**Note:** All methods resets properly and enters into USB DFU mode automatically. If it does not work, try a power-cycle (press reset button or reconnect USB cable).
 
 ### More than one probe/ST-Link?
 
@@ -299,15 +292,45 @@ RAM Map:
 └─ 0x20000000 - 0x20005FFF : 24KB (used by bootloader and ChibiOS)
 ```
 
+## VSCode Tasks
+
+Build tasks available in `.vscode/tasks.json`. Run via: `Ctrl+Shift+P` → "Tasks: Run Task"
+
+**Build Tasks**
+
+| Task | Description |
+|------|-------------|
+| Build Bootloader | Build bootloader (default) |
+| Build Bootloader (DEBUG) | Build debug bootloader* |
+| Clean Bootloader | Remove bootloader build files |
+| Rebuild Bootloader | Clean and build bootloader |
+| Rebuild Bootloader (DEBUG) | Clean and build debug bootloader* |
+
+(*) Nothing special yet implemented for when flashing with debugging.
+
+**Flash Tasks**
+
+| Task | Description |
+|------|-------------|
+| Flash Bootloader (OpenOCD) | Flash bootloader via ST-Link SWD |
+| Flash Bootloader (st-flash) | Flash bootloader via st-flash |
+
+**Utility Tasks**
+
+| Task | Description |
+|------|-------------|
+| Static Analysis (cppcheck) of Bootloader | Run cppcheck on bootloader source |
+| Check USB Device | List connected STM32 USB devices |
+| Show Memory Usage of Bootloader | Display bootloader memory section sizes |
+
+
 ## Debugging
 
 ### GDB with OpenOCD
 
 Terminal 1 (OpenOCD server):
 ```bash
-sudo openocd -f interface/stlink.cfg \
-  -c "transport select swd" \
-  -f target/stm32c0x.cfg
+openocd -f interface/stlink.cfg -f target/stm32c0x.cfg
 ```
 
 Terminal 2 (GDB client):

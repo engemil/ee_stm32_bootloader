@@ -1,5 +1,15 @@
 {
     "version": "2.0.0",
+    "options": {
+        "presentation": {
+            "echo": true,
+            "reveal": "always",
+            "focus": false,
+            "panel": "shared",
+            "showReuseMessage": false,
+            "clear": true
+        }
+    },
     "tasks": [
         {
             "label": "Build Bootloader",
@@ -15,14 +25,7 @@
             "problemMatcher": [
                 "$gcc"
             ],
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": false,
-                "clear": true
-            }
+            "detail": "Build the bootloader firmware"
         },
         {
             "label": "Clean Bootloader",
@@ -31,29 +34,52 @@
             "options": {
                 "cwd": "${workspaceFolder}/bootloader"
             },
-            "problemMatcher": []
+            "problemMatcher": [],
+            "detail": "Clean bootloader build files"
         },
         {
             "label": "Build Bootloader (DEBUG)",
             "type": "shell",
-            "command": "make DEBUG=1",
+            "command": "make debug",
             "options": {
                 "cwd": "${workspaceFolder}/bootloader"
             },
             "group": "build",
             "problemMatcher": [
                 "$gcc"
-            ]
+            ],
+            "detail": "Build debug bootloader"
+        },
+        {
+            "label": "Rebuild Bootloader",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "Clean Bootloader",
+                "Build Bootloader"
+            ],
+            "problemMatcher": [],
+            "detail": "Clean and rebuild bootloader"
+        },
+        {
+            "label": "Rebuild Bootloader (DEBUG)",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "Clean Bootloader",
+                "Build Bootloader (DEBUG)"
+            ],
+            "problemMatcher": [],
+            "detail": "Clean and rebuild debug bootloader"
         },
         {
             "label": "Flash Bootloader (OpenOCD)",
             "type": "shell",
-            "command": "sudo openocd -f interface/stlink.cfg -c \"transport select swd\" -f target/stm32c0x.cfg -c \"program build/bootloader.bin 0x08000000 verify reset exit\"",
+            "command": "openocd -f interface/stlink.cfg -c \"transport select swd\" -f target/stm32c0x.cfg -c \"program build/bootloader.bin 0x08000000 verify reset exit\"",
             "options": {
                 "cwd": "${workspaceFolder}/bootloader"
             },
             "problemMatcher": [],
-            "dependsOn": "Build Bootloader"
+            "dependsOn": "Build Bootloader",
+            "detail": "Flash bootloader via OpenOCD (ST-Link SWD)"
         },
         {
             "label": "Flash Bootloader (st-flash)",
@@ -63,7 +89,8 @@
                 "cwd": "${workspaceFolder}/bootloader"
             },
             "problemMatcher": [],
-            "dependsOn": "Build Bootloader"
+            "dependsOn": "Build Bootloader",
+            "detail": "Flash bootloader via st-flash (ST-Link)"
         },
         {
             "label": "Static Analysis (cppcheck) of Bootloader",
@@ -73,24 +100,14 @@
                 "cwd": "${workspaceFolder}/bootloader"
             },
             "problemMatcher": [],
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared"
-            }
+            "detail": "Run static analysis on bootloader source"
         },
         {
             "label": "Check USB Device",
             "type": "shell",
             "command": "lsusb | grep 0483 && echo '---' && dfu-util -l",
             "problemMatcher": [],
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared"
-            }
+            "detail": "List connected STM32 USB devices"
         },
         {
             "label": "Show Memory Usage of Bootloader",
@@ -100,25 +117,8 @@
                 "cwd": "${workspaceFolder}/bootloader"
             },
             "problemMatcher": [],
-            "dependsOn": "Build Bootloader"
-        },
-        {
-            "label": "Rebuild Bootloader",
-            "dependsOrder": "sequence",
-            "dependsOn": [
-                "Clean Bootloader",
-                "Build Bootloader"
-            ],
-            "problemMatcher": []
-        },
-        {
-            "label": "Rebuild Bootloader (DEBUG)",
-            "dependsOrder": "sequence",
-            "dependsOn": [
-                "Clean Bootloader",
-                "Build Bootloader (DEBUG)"
-            ],
-            "problemMatcher": []
+            "dependsOn": "Build Bootloader",
+            "detail": "Display bootloader memory section sizes"
         }
     ]
 }

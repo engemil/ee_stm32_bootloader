@@ -11,6 +11,14 @@ All notable changes to the EngEmil STM32 Bootloader project will be documented i
 
 Note: Update `BOOTLOADER_VERSION` in `bootloader.c` when publishing new version.
 
+
+## [Development] - (2026-03-01)
+
+Changed
+- VScode tasks adjusted and reorganized.
+- Makefile tasks adjusted.
+- Updated README file.
+
 ---
 
 ## [1.2.1] - (2026-02-22)

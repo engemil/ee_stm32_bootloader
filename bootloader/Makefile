@@ -190,17 +190,33 @@ include $(RULESPATH)/rules.mk
 # Custom rules
 #
 
-# Upload target using st-flash
-upload: build/$(PROJECT).bin
-	@echo "Uploading bootloader to STM32C071RB via st-flash"
-	st-flash write build/$(PROJECT).bin 0x08000000
-
 # Static analysis with cppcheck
 check:
 	cppcheck --enable=all --std=c11 --suppress=missingIncludeSystem src/ inc/
 
-.PHONY: upload check
+.PHONY: check
 
 #
 # Custom rules
+##############################################################################
+
+##############################################################################
+# Debug/Release build targets
+#
+
+.PHONY: debug clean-build
+
+# Clean build directory for fresh rebuild
+clean-build:
+	@echo "Cleaning build directory for fresh rebuild..."
+	@rm -rf $(BUILDDIR)
+	@rm -rf $(DEPDIR)
+
+# Debug build 
+# Forces clean rebuild (no flash)
+debug: clean-build
+	$(MAKE) all UDEFS="$(UDEFS) -DBOOTLOADER_DEBUG=1"
+
+#
+# Debug/Release build targets
 ##############################################################################
