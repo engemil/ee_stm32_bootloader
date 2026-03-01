@@ -1,12 +1,14 @@
 {
     // Bootloader Settings
-    "settings.bootloader.folder": "${workspaceFolder}/bootloader", // Path to bootloader project folder
+    "settings.bootloader.folder": "${workspaceFolder}/bootloader",
+    "settings.bootloader.compiledElfFile": "${workspaceFolder}/bootloader/build/bootloader.elf",
+    "settings.bootloader.svdFile": "${workspaceFolder}/bootloader/STM32C071.svd",
+    "settings.bootloader.device": "STM32C071RB",
 
     // OpenOCD Settings
-    "settings.openocd.interface": "interface/stlink.cfg", // OpenOCD Debugger interface file
-    "settings.openocd.board": "board/st_nucleo_c0.cfg", // OpenOCD Board file
+    "settings.openocd.interface": "interface/stlink.cfg",
+    "settings.openocd.board": "board/st_nucleo_c0.cfg",
 
     // Flash Address Settings
-    "settings.flash.bootloaderAddress": "0x08000000" // Bootloader flash start address
-
+    "settings.flash.bootloaderAddress": "0x08000000"
 }

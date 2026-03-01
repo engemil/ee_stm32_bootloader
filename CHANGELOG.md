@@ -20,6 +20,13 @@ Changed
 - Updated README file.
 - Cleanup of vscode files.
 
+Added
+- Alternative optimization for debugging.
+- Added warnings about max (3-4?) breakpoints.
+
+Fixed
+- Fixed debugging in VS Code (.vscode/launch.json-file).
+
 ---
 
 ## [1.2.1] - (2026-02-22)

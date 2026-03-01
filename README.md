@@ -301,12 +301,10 @@ Build tasks available in `.vscode/tasks.json`. Run via: `Ctrl+Shift+P` → "Task
 | Task | Description |
 |------|-------------|
 | Build Bootloader | Build bootloader (default) |
-| Build Bootloader (DEBUG) | Build debug bootloader* |
+| Build Bootloader (DEBUG) | Build debug bootloader |
 | Clean Bootloader | Remove bootloader build files |
 | Rebuild Bootloader | Clean and build bootloader |
-| Rebuild Bootloader (DEBUG) | Clean and build debug bootloader* |
-
-(*) Nothing special yet implemented for when flashing with debugging.
+| Rebuild Bootloader (DEBUG) | Clean and build debug bootloader |
 
 **Flash Tasks**
 
@@ -326,7 +324,27 @@ Build tasks available in `.vscode/tasks.json`. Run via: `Ctrl+Shift+P` → "Task
 
 ## Debugging
 
-### GDB with OpenOCD
+### VS Code Debug Configuration
+
+A debug configuration is available in `.vscode/launch.json`:
+
+| Configuration | Description |
+|---------------|-------------|
+| **Rebuild and Debug Bootloader** | Clean rebuild with `-Og` optimization, flash, and debug |
+
+The configuration:
+- Runs `Rebuild Bootloader (DEBUG)` before debugging
+- Flashes `bootloader.bin` to `0x08000000`
+- Uses `-Og` optimization (debug-friendly)
+
+### Hardware Breakpoint Limitation
+
+> **Warning:** The STM32C0 (Cortex-M0+) has only **(3-4?) hardware breakpoints**.
+> Software breakpoints do not work in flash memory.
+> 
+> If breakpoints are not being hit, check that you haven't exceeded this limit.
+
+### Manual GDB with OpenOCD
 
 Terminal 1 (OpenOCD server):
 ```bash
@@ -343,12 +361,6 @@ gdb-multiarch build/bootloader.elf
 (gdb) break main
 (gdb) continue
 ```
-
-### VS Code Debugging
-1. Start OpenOCD server (Terminal 1 above)
-2. In VS Code: Press `F5` or Run > Start Debugging
-3. Select configuration: "Debug Bootloader (OpenOCD)"
-4. Debugger will stop at `main()`
 
 
 ## Contributing

@@ -213,9 +213,9 @@ clean-build:
 	@rm -rf $(DEPDIR)
 
 # Debug build 
-# Forces clean rebuild (no flash)
+# Forces clean rebuild with -Og optimization (no flash)
 debug: clean-build
-	$(MAKE) all UDEFS="$(UDEFS) -DBOOTLOADER_DEBUG=1"
+	$(MAKE) all USE_OPT="-Og -ggdb -fno-omit-frame-pointer -falign-functions=16" UDEFS="$(UDEFS) -DBOOTLOADER_DEBUG=1"
 
 #
 # Debug/Release build targets
