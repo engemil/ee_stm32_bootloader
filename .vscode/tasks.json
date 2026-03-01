@@ -16,7 +16,7 @@
             "type": "shell",
             "command": "make",
             "options": {
-                "cwd": "${workspaceFolder}/bootloader"
+                "cwd": "${config:settings.bootloader.folder}"
             },
             "group": {
                 "kind": "build",
@@ -32,7 +32,7 @@
             "type": "shell",
             "command": "make clean",
             "options": {
-                "cwd": "${workspaceFolder}/bootloader"
+                "cwd": "${config:settings.bootloader.folder}"
             },
             "problemMatcher": [],
             "detail": "Clean bootloader build files"
@@ -42,7 +42,7 @@
             "type": "shell",
             "command": "make debug",
             "options": {
-                "cwd": "${workspaceFolder}/bootloader"
+                "cwd": "${config:settings.bootloader.folder}"
             },
             "group": "build",
             "problemMatcher": [
@@ -73,9 +73,9 @@
         {
             "label": "Flash Bootloader (OpenOCD)",
             "type": "shell",
-            "command": "openocd -f interface/stlink.cfg -c \"transport select swd\" -f target/stm32c0x.cfg -c \"program build/bootloader.bin 0x08000000 verify reset exit\"",
+            "command": "pkill -9 openocd || true; openocd -f ${config:settings.openocd.interface} -f ${config:settings.openocd.board} -c \"program build/bootloader.bin ${config:settings.flash.bootloaderAddress} verify reset exit\"",
             "options": {
-                "cwd": "${workspaceFolder}/bootloader"
+                "cwd": "${config:settings.bootloader.folder}"
             },
             "problemMatcher": [],
             "dependsOn": "Build Bootloader",
@@ -84,20 +84,20 @@
         {
             "label": "Flash Bootloader (st-flash)",
             "type": "shell",
-            "command": "st-flash --reset write build/bootloader.bin 0x08000000",
+            "command": "st-flash --reset write build/bootloader.bin ${config:settings.flash.bootloaderAddress}",
             "options": {
-                "cwd": "${workspaceFolder}/bootloader"
+                "cwd": "${config:settings.bootloader.folder}"
             },
             "problemMatcher": [],
             "dependsOn": "Build Bootloader",
             "detail": "Flash bootloader via st-flash (ST-Link)"
         },
-        {
+{
             "label": "Static Analysis (cppcheck) of Bootloader",
             "type": "shell",
-            "command": "cppcheck --enable=all --std=c11 --suppress=missingIncludeSystem -I inc -I ../ext/ChibiOS/os/common/ext/ST/STM32C0xx -I ../ext/ChibiOS/os/common/ext/ARM/CMSIS/Core/Include -I ../ext/ChibiOS/os/hal/include -I ../ext/ChibiOS/os/hal/ports/STM32/STM32C0xx -I ../ext/ChibiOS/os/hal/ports/STM32/LLD/DMAv1 -I ../ext/ChibiOS/os/hal/ports/STM32/LLD/TIMv1 -I ../ext/ChibiOS/os/hal/ports/STM32/LLD/USBv1 -I ../ext/ChibiOS/os/rt/include src/",
+            "command": "cppcheck --enable=all --std=c11 --suppress=missingIncludeSystem -I inc -I ../ext/ChibiOS/os/common/ext/ST/STM32C0xx -I ../ext/ChibiOS/os/common/ext/ARM/CMSIS/Core/Include -I ../ext/ChibiOS/os/hal/include -I ../ext/ChibiOS/os/hal/ports/STM32/STM32C0xx -I ../ext/ChibiOS/os/hal/ports/STM32/LLD/DMAv1 -I ../ext/ChibiOS/os/hal/ports/STM32/LLD/TIMv1 -I ../ext/ChibiOS/os/hal/ports/STM32/LLD/USBv1 src/",
             "options": {
-                "cwd": "${workspaceFolder}/bootloader"
+                "cwd": "${config:settings.bootloader.folder}"
             },
             "problemMatcher": [],
             "detail": "Run static analysis on bootloader source"
@@ -114,7 +114,7 @@
             "type": "shell",
             "command": "arm-none-eabi-size -A -d build/bootloader.elf",
             "options": {
-                "cwd": "${workspaceFolder}/bootloader"
+                "cwd": "${config:settings.bootloader.folder}"
             },
             "problemMatcher": [],
             "dependsOn": "Build Bootloader",

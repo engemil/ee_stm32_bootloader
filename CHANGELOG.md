@@ -18,6 +18,7 @@ Changed
 - VScode tasks adjusted and reorganized.
 - Makefile tasks adjusted.
 - Updated README file.
+- Cleanup of vscode files.
 
 ---
 
