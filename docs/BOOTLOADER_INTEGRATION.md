@@ -164,7 +164,7 @@ sign_firmware: $(BUILDDIR)/$(PROJECT).bin
 ##############################################################################
 ```
 
-**Note:** Adjust `SIGN_SCRIPT` path based on your project location relative to `scripts/sign_app_header.sh` in the workspace root.
+**Note:** Adjust `SIGN_SCRIPT` path based on your project location relative to `scripts/sign_app_header.sh`.
 
 ### Step 3: Update main.c
 
