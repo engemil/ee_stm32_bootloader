@@ -12,6 +12,31 @@ All notable changes to the EngEmil STM32 Bootloader project will be documented i
 Note: Update `BOOTLOADER_VERSION` in `bootloader.c` when publishing new version.
 
 
+## [1.3.0] - (2026-03-18)
+
+Fixed
+- **Bootloader inactivity timeout was never firing.** The timeout used ChibiOS
+  `chVTTimeElapsedSinceX()` with a 16-bit `systime_t` (wraps every ~6.5s at
+  10kHz tick), making the 60-second comparison permanently false. Replaced with
+  a simple millisecond countdown timer that is independent of `systime_t` width
+  and tick frequency.
+- **USB host polling was resetting the timeout.** `bootloader_timeout_reset()`
+  was called on every DFU class request, including passive `DFU_GETSTATUS` and
+  `DFU_GETSTATE` polls from the host. Timeout now only resets on meaningful
+  activity (`DFU_DNLOAD`, `DFU_CLRSTATUS`).
+
+Changed
+- `bootloader_run()` now returns `bool`: `true` on inactivity timeout (caller
+  should jump to app), `false` on completed download (caller should reset).
+- Restructured `main()` flow: single DFU entry point with a `for(;;)` loop,
+  proper USB teardown (`usbDisconnectBus` + `usbStop`) before jumping to app
+  on timeout, and recovery path if app validation fails after timeout.
+
+Added
+- `bootloader_timeout_tick()` function for decrementing timeout from main loop.
+
+---
+
 ## [Development] - (2026-03-04)
 
 Changed

@@ -49,8 +49,6 @@ SOFTWARE.
  * 4. Watchdog reset detected (commented out until watchdog implemented)
  */
 int main(void) {
-    int result;
-
     /*
      * System initializations.
      * - HAL initialization, this also initializes the configured device drivers
@@ -62,43 +60,42 @@ int main(void) {
     chSysInit();
 
     /* Initialize bootloader */
-    result = bootloader_init();
-    if (result != ERR_SUCCESS) {
-        /* Fatal error - stay in bootloader */
+    if (bootloader_init() != ERR_SUCCESS) {
+        /* Fatal error - halt */
         while (true) {
-            /* Blink error pattern or just halt */
             chThdSleepMilliseconds(1000);
         }
     }
 
-    /* Check bootloader entry conditions */
-    if (bootloader_should_enter()) {
-        /* Initialize USB DFU */
-        usb_dfu_init();
-
-        /* Run bootloader - wait for firmware update via USB DFU */
-        bootloader_run();
-
-        /* After successful firmware update, reset to boot new firmware */
-        NVIC_SystemReset();
-    }
-
-    /* Validate application before jumping */
-    if (bootloader_validate_app()) {
-        /* Deinitialize ChibiOS and jump to application */
+    /* Fast path: no reason to enter bootloader, app is valid -> jump */
+    if (!bootloader_should_enter()) {
         chSysDisable();
         bootloader_jump_to_app();
+        /* bootloader_jump_to_app() only returns if validation fails,
+         * fall through to DFU mode */
+        chSysInit();
     }
 
-    /* If we reach here, application jump failed or validation failed */
-    /* Initialize USB DFU and stay in bootloader mode */
+    /* Enter DFU mode */
     usb_dfu_init();
-    bootloader_run();
 
-    /* Should never reach here */
-    while (true) {
-        chThdSleepMilliseconds(1000);
+    for (;;) {
+        bool timeout_exit = bootloader_run();
+
+        if (!timeout_exit) {
+            /* Download completed - reset to boot new firmware cleanly */
+            NVIC_SystemReset();
+        }
+
+        /* Inactivity timeout with valid app - tear down USB and jump */
+        usbDisconnectBus(&USBD1);
+        usbStop(&USBD1);
+        chSysDisable();
+        bootloader_jump_to_app();
+
+        /* bootloader_jump_to_app() only returns if validation fails.
+         * Re-init and loop back to DFU mode. */
+        chSysInit();
+        usb_dfu_init();
     }
-
-    return 0;
 }

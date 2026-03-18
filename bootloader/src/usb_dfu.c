@@ -444,9 +444,6 @@ static bool dfu_request_hook(USBDriver *usbp) {
     if ((usbp->setup[0] & USB_RTYPE_TYPE_MASK) != USB_RTYPE_TYPE_CLASS) {
         return false;
     }
-    
-    /* Reset bootloader timeout on any DFU activity */
-    bootloader_timeout_reset();
 
     uint8_t bRequest = usbp->setup[1];
     uint16_t wValue = (usbp->setup[3] << 8) | usbp->setup[2];
@@ -454,18 +451,24 @@ static bool dfu_request_hook(USBDriver *usbp) {
 
     switch (bRequest) {
     case DFU_REQ_DNLOAD:
+        /* Reset timeout only on actual download activity */
+        bootloader_timeout_reset();
         dfu_dnload_handler(usbp, wValue, wLength);
         return true;
 
     case DFU_REQ_GETSTATUS:
+        /* Passive host polling - do not reset timeout */
         dfu_getstatus_handler(usbp);
         return true;
 
     case DFU_REQ_CLRSTATUS:
+        /* User is recovering from error - reset timeout */
+        bootloader_timeout_reset();
         dfu_clrstatus_handler(usbp);
         return true;
 
     case DFU_REQ_GETSTATE:
+        /* Passive host polling - do not reset timeout */
         dfu_getstate_handler(usbp);
         return true;
 
@@ -529,13 +532,8 @@ int usb_dfu_init(void) {
  * - Write buffered firmware data to flash
  */
 void usb_dfu_process(void) {
-    /* Reset timeout on flash operations (activity is happening) */
-    
     /* Check if we have data to process */
     if (dfu_ctx.state == DFU_STATE_DFU_DNBUSY && dfu_ctx.buffer_len > 0) {
-        
-        /* Reset timeout when processing data */
-        bootloader_timeout_reset();
         
         /* Handle DFUSe special commands (block_num == 0xFFFF) */
         if (dfu_ctx.block_num == 0xFFFF) {

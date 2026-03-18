@@ -31,10 +31,10 @@ SOFTWARE.
 #include "ch.h"
 #include "hal.h"
 
-#define BOOTLOADER_VERSION 0x00010201  /* Version 1.2.1 */
+#define BOOTLOADER_VERSION 0x00010300  /* Version 1.3.0 */
 
 static bootloader_state_t state = BOOTLOADER_STATE_IDLE;
-static systime_t timeout_start = 0;
+static uint32_t timeout_remaining_ms = 0;
 static bool timeout_enabled = false;
 
 /**
@@ -86,20 +86,41 @@ bool bootloader_should_enter(void)
 }
 
 /**
- * @brief Initialize bootloader timeout
+ * @brief Initialize and start bootloader timeout
  */
 void bootloader_timeout_init(void)
 {
-    timeout_start = chVTGetSystemTime();
+    timeout_remaining_ms = BOOTLOADER_TIMEOUT_MS;
     timeout_enabled = true;
 }
 
 /**
- * @brief Reset bootloader timeout (call on USB activity)
+ * @brief Reset bootloader timeout (call on DFU download activity)
  */
 void bootloader_timeout_reset(void)
 {
-    timeout_start = chVTGetSystemTime();
+    timeout_remaining_ms = BOOTLOADER_TIMEOUT_MS;
+}
+
+/**
+ * @brief Tick the bootloader timeout countdown
+ * 
+ * Must be called periodically from the main loop with the
+ * number of milliseconds elapsed since the last call.
+ * 
+ * @param ms milliseconds elapsed since last tick
+ */
+void bootloader_timeout_tick(uint32_t ms)
+{
+    if (!timeout_enabled) {
+        return;
+    }
+
+    if (timeout_remaining_ms <= ms) {
+        timeout_remaining_ms = 0;
+    } else {
+        timeout_remaining_ms -= ms;
+    }
 }
 
 /**
@@ -111,12 +132,8 @@ bool bootloader_timeout_expired(void)
     if (!timeout_enabled) {
         return false;
     }
-    
-    systime_t elapsed = chVTTimeElapsedSinceX(timeout_start);
-    sysinterval_t timeout_ticks = TIME_MS2I(BOOTLOADER_TIMEOUT_MS);
-    
-    /* Check if elapsed time exceeds timeout */
-    return elapsed >= timeout_ticks;
+
+    return timeout_remaining_ms == 0;
 }
 
 /**
@@ -132,14 +149,16 @@ void bootloader_timeout_disable(void)
  */
 void bootloader_timeout_enable(void)
 {
-    timeout_start = chVTGetSystemTime();
+    timeout_remaining_ms = BOOTLOADER_TIMEOUT_MS;
     timeout_enabled = true;
 }
 
 /**
  * @brief Run bootloader main loop
+ * @return true if exited due to timeout (caller should jump to app),
+ *         false if exited due to completed download (caller should reset)
  */
-void bootloader_run(void)
+bool bootloader_run(void)
 {
     state = BOOTLOADER_STATE_UPDATING;
     
@@ -154,24 +173,27 @@ void bootloader_run(void)
         /* Check if firmware download completed successfully */
         if (usb_dfu_download_complete()) {
             state = BOOTLOADER_STATE_IDLE;
-            break;
+            return false;  /* Download complete - caller should reset */
         }
         
         /* Check timeout - if expired, try to jump to app */
         if (bootloader_timeout_expired()) {
             /* Timeout expired - try to jump to application */
             if (bootloader_validate_app()) {
-                /* Valid application exists, jump to it */
+                /* Valid application exists - signal caller to jump directly */
                 state = BOOTLOADER_STATE_IDLE;
-                break;
+                return true;  /* Timeout exit - caller should jump to app */
             }
             /* No valid application - reset timeout and stay in bootloader */
             bootloader_timeout_reset();
         }
         
-        /* Yield to ChibiOS scheduler - check every 10ms */
+        /* Yield to ChibiOS scheduler - poll every 10ms */
         chThdSleepMilliseconds(10);
+        bootloader_timeout_tick(10);
     }
+    
+    return false;
 }
 
 /**

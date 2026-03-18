@@ -84,8 +84,13 @@ bool bootloader_should_enter(void);
  * 
  * Enters update mode and waits for firmware via USB DFU.
  * This function blocks until update is complete or timeout.
+ * 
+ * @return true if exited due to inactivity timeout with a valid app
+ *         (caller should jump directly to app),
+ *         false if exited due to completed download
+ *         (caller should reset to boot new firmware)
  */
-void bootloader_run(void);
+bool bootloader_run(void);
 
 /**
  * @brief Validate application firmware
@@ -112,18 +117,29 @@ void bootloader_jump_to_app(void);
 uint32_t bootloader_get_version(void);
 
 /**
- * @brief Initialize bootloader timeout
+ * @brief Initialize and start bootloader timeout
  * 
- * Starts the timeout countdown timer.
+ * Starts the timeout countdown from BOOTLOADER_TIMEOUT_MS.
  */
 void bootloader_timeout_init(void);
 
 /**
  * @brief Reset bootloader timeout
  * 
- * Resets the timeout timer to zero. Should be called on USB activity.
+ * Resets the countdown to BOOTLOADER_TIMEOUT_MS.
+ * Should be called on meaningful DFU activity (e.g. download).
  */
 void bootloader_timeout_reset(void);
+
+/**
+ * @brief Tick the bootloader timeout countdown
+ * 
+ * Must be called periodically from the main loop with the
+ * number of milliseconds elapsed since the last call.
+ * 
+ * @param ms milliseconds elapsed since last tick
+ */
+void bootloader_timeout_tick(uint32_t ms);
 
 /**
  * @brief Check if bootloader timeout has expired
@@ -142,7 +158,7 @@ void bootloader_timeout_disable(void);
 /**
  * @brief Enable and reset bootloader timeout
  * 
- * Re-enables the timeout mechanism and resets the timer.
+ * Re-enables the timeout mechanism and resets the countdown.
  * Same as bootloader_timeout_init().
  */
 void bootloader_timeout_enable(void);
