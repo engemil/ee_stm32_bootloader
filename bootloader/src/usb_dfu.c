@@ -204,12 +204,13 @@ static const uint8_t vcom_string2[] = {
     'o', 0, 'd', 0, 'e', 0
 };
 
-static const uint8_t vcom_string3[] = {
-    USB_DESC_BYTE(26),                      /* bLength                      */
-    USB_DESC_BYTE(USB_DESCRIPTOR_STRING),   /* bDescriptorType              */
-    '0', 0, '1', 0, '2', 0, '3', 0, '4', 0, '5', 0, '6', 0, '7', 0,
-    '8', 0, '9', 0, 'A', 0, 'B', 0
-};
+/*
+ * Serial Number string.
+ * Populated at runtime from the STM32 96-bit unique device ID (UID).
+ * Format: 24 uppercase hex characters (3 x 32-bit words).
+ * Buffer size: 2 (header) + 24 * 2 (UTF-16LE) = 50 bytes.
+ */
+static uint8_t vcom_string3[50];
 
 /* DFUSe interface string descriptor */
 /* Format: @Internal Flash  /0x08004000/112*001Kg */
@@ -225,8 +226,9 @@ static const uint8_t vcom_string4[] = {
 
 /**
  * @brief String Descriptors array
+ * @note  Not const because vcom_string3 (serial number) is populated at runtime.
  */
-static const USBDescriptor vcom_strings[] = {
+static USBDescriptor vcom_strings[] = {
     {sizeof vcom_string0, vcom_string0},
     {sizeof vcom_string1, vcom_string1},
     {sizeof vcom_string2, vcom_string2},
@@ -491,6 +493,40 @@ static bool dfu_request_hook(USBDriver *usbp) {
 /*===========================================================================*/
 
 /**
+ * @brief   Populate USB serial number string descriptor from STM32 chip UID.
+ * @note    Reads the 96-bit unique device ID from UID_BASE (0x1FFF7550)
+ *          and formats it as 24 uppercase hex characters in a USB string
+ *          descriptor (UTF-16LE).
+ */
+static void set_serial_from_uid(void) {
+    static const char hex_chars[] = "0123456789ABCDEF";
+    const uint32_t *uid = (const uint32_t *)UID_BASE;
+    uint8_t hex_str[24];
+    unsigned i;
+
+    /* Format 3 x 32-bit UID words as 24 uppercase hex characters. */
+    for (i = 0; i < 3; i++) {
+        uint32_t w = uid[i];
+        hex_str[i * 8 + 0] = hex_chars[(w >> 28) & 0xFU];
+        hex_str[i * 8 + 1] = hex_chars[(w >> 24) & 0xFU];
+        hex_str[i * 8 + 2] = hex_chars[(w >> 20) & 0xFU];
+        hex_str[i * 8 + 3] = hex_chars[(w >> 16) & 0xFU];
+        hex_str[i * 8 + 4] = hex_chars[(w >> 12) & 0xFU];
+        hex_str[i * 8 + 5] = hex_chars[(w >>  8) & 0xFU];
+        hex_str[i * 8 + 6] = hex_chars[(w >>  4) & 0xFU];
+        hex_str[i * 8 + 7] = hex_chars[(w >>  0) & 0xFU];
+    }
+
+    /* Build USB string descriptor: header + UTF-16LE characters. */
+    vcom_string3[0] = (uint8_t)sizeof(vcom_string3);   /* bLength (50)              */
+    vcom_string3[1] = USB_DESCRIPTOR_STRING;            /* bDescriptorType           */
+    for (i = 0; i < 24; i++) {
+        vcom_string3[2 + i * 2]     = hex_str[i];      /* ASCII character           */
+        vcom_string3[2 + i * 2 + 1] = 0;               /* UTF-16LE high byte        */
+    }
+}
+
+/**
  * @brief Initialize USB DFU
  */
 int usb_dfu_init(void) {
@@ -514,6 +550,9 @@ int usb_dfu_init(void) {
     vcom_device_descriptor_data[9]  = (uint8_t)((vid >> 8) & 0xFF);
     vcom_device_descriptor_data[10] = (uint8_t)(pid & 0xFF);
     vcom_device_descriptor_data[11] = (uint8_t)((pid >> 8) & 0xFF);
+
+    /* Populate USB serial number from chip UID before USB starts */
+    set_serial_from_uid();
 
     /* Initialize USB driver */
     usbDisconnectBus(&USBD1);

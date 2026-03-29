@@ -12,6 +12,17 @@ All notable changes to the EngEmil STM32 Bootloader project will be documented i
 Note: Update `BOOTLOADER_VERSION` in `bootloader.c` when publishing new version.
 
 
+## [1.4.0] - (2026-03-29)
+
+Added
+- **USB serial number from chip UID** — The USB iSerialNumber descriptor now
+  reports the STM32C071RB 96-bit hardware unique ID (`UID_BASE` at `0x1FFF7550`)
+  formatted as 24 uppercase hex characters (e.g., `004F00224E500C20334B3120`).
+  Replaces the previous hardcoded placeholder serial. This ensures the bootloader
+  and application always report the same globally unique, immutable device identity.
+
+---
+
 ## [1.3.0] - (2026-03-18)
 
 Fixed
