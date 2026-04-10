@@ -36,8 +36,8 @@ make
 ```
 
 Output files:
-- `build/your_project.bin` - Unsigned (do not upload)
-- `build/your_project_signed.bin` - **Upload this one!**
+- `build/your_project.bin` - Unsigned (if you do NOT use bootloader)
+- `build/your_project_signed.bin` - **If you do use bootloader**
 
 ## Upload Firmware
 

@@ -23,8 +23,8 @@ cd application && make clean && make
 - CRC32 checksum (for bootloader validation)
 
 **Output files:**
-- `build/led-test-app-fw.bin` - Unsigned binary (do not upload)
-- `build/led-test-app-fw_signed.bin` - **Ready to upload** (includes CRC32)
+- `build/led-test-app-fw.bin` - Unsigned binary (if you do NOT use bootloader)
+- `build/led-test-app-fw_signed.bin` - **if you use bootloader** (includes CRC32)
 
 **Always upload the `_signed.bin` file!** The bootloader requires a valid CRC32 to execute the firmware.
 

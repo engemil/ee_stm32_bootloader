@@ -219,8 +219,8 @@ CRC32:            0xXXXXXXXX
 ============================================================
 
 ✓ Build and signing complete!
-  Unsigned: build/your_project.bin (do not upload)
-  Signed:   build/your_project_signed.bin (ready to upload)
+  Unsigned: build/your_project.bin (if you do NOT use bootloader)
+  Signed:   build/your_project_signed.bin (if you use bootloader)
 ```
 
 

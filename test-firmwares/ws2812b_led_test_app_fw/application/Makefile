@@ -220,8 +220,8 @@ sign_firmware: $(BUILDDIR)/$(PROJECT).bin
 	@bash $(SIGN_SCRIPT) $(BUILDDIR)/$(PROJECT).bin $(BUILDDIR)/$(PROJECT)_signed.bin
 	@echo ""
 	@echo "✓ Build and signing complete!"
-	@echo "  Unsigned: $(BUILDDIR)/$(PROJECT).bin (do not upload)"
-	@echo "  Signed:   $(BUILDDIR)/$(PROJECT)_signed.bin (ready to upload)"
+	@echo "  Unsigned: $(BUILDDIR)/$(PROJECT).bin (if you do NOT use bootloader)"
+	@echo "  Signed:   $(BUILDDIR)/$(PROJECT)_signed.bin (if you do use bootloader)"
 	@echo ""
 
 .PHONY: sign_firmware
