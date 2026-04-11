@@ -97,4 +97,4 @@ void enter_bootloader(void) {
 Test firmware uses:
 - **Toolchain:** ARM GCC (`arm-none-eabi-gcc`)
 - **Build Tool:** GNU Make
-- **CRC32 Signing:** `scripts/sign_app_header.sh`
+- **CRC32 Signing:** `scripts/build/sign_app_header.sh`

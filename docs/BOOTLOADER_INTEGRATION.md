@@ -144,7 +144,7 @@ Find the "Custom rules" section and add:
 #
 
 # Path to signing script (adjust if needed)
-SIGN_SCRIPT = ../../../scripts/sign_app_header.sh
+SIGN_SCRIPT = ../../../scripts/build/sign_app_header.sh
 
 # Automatic firmware signing after build
 POST_MAKE_ALL_RULE_HOOK: sign_firmware
@@ -164,7 +164,7 @@ sign_firmware: $(BUILDDIR)/$(PROJECT).bin
 ##############################################################################
 ```
 
-**Note:** Adjust `SIGN_SCRIPT` path based on your project location relative to `scripts/sign_app_header.sh`.
+**Note:** Adjust `SIGN_SCRIPT` path based on your project location relative to `scripts/build/sign_app_header.sh`.
 
 ### Step 3: Update main.c
 

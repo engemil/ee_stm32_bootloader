@@ -19,7 +19,7 @@ Open `Makefile.snippet` and apply the 4 changes to your project's Makefile:
 - Change linker script to `STM32C071xB_bootloader.ld`
 - Add `app_header.c` to `CSRC`
 - Add post-build signing rules
-- Adjust `SIGN_SCRIPT` path if needed (include also the script `scripts/sign_app_header.sh`)
+- Adjust `SIGN_SCRIPT` path if needed (include also the script `scripts/build/sign_app_header.sh`)
 
 ### 3. Update Your main.c
 

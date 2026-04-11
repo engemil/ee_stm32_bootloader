@@ -112,7 +112,8 @@ See sections below for detailed instructions.
 ├── ext/                         - External dependencies
 ├── scripts/                     - Build and utility scripts
 │   ├── system/                  - System related scripts for Ubuntu (Linux)
-│   └── sign_app_header.sh       - Post-build script: calculate and sign firmware size/CRC32
+│   ├── build/                   - Build-related scripts
+│   │   └── sign_app_header.sh   - Post-build script: calculate and sign firmware size/CRC32
 ├── test-firmwares/              - Test application firmwares for validation
 │   ├── led_test_app_fw/         - LED example
 │   ├── template/                - Ready-to-use integration template
