@@ -61,19 +61,11 @@ The bootloader validates firmware before execution:
 └─────────────────────────────────────────┘
 ```
 
-**USB VID/PID:** The bootloader reads VID/PID from the application header when entering DFU mode (if valid magic present). This allows the application to define its USB identifiers, used consistently in both DFU mode and normal CDC operation. Default fallback: VID=0x0483, PID=0xDF11.
+**USB VID/PID:** The bootloader always reads VID/PID from the application header when entering DFU mode (if valid magic present and VID/PID values are sane). This allows each application to define its own USB identifiers, used consistently in both DFU mode and normal CDC operation.
 
-This behavior is configurable via `USE_APP_HEADER_USB_IDS` macro in `bootloader/inc/config.h`:
+If no valid application header is found (blank/erased flash, or VID/PID fields are `0x0000`/`0xFFFF`), the bootloader falls back to the STM32 DFU identifiers: VID=`0x0483` (STMicroelectronics), PID=`0xDF11` (DFU mode).
 
-| Macro State | Behavior |
-|-------------|----------|
-| **Defined** | Read VID/PID from app header if valid magic, otherwise use defaults |
-| **Undefined** (by default) | Always use `USB_DEFAULT_VID` (0x0483) and `USB_DEFAULT_PID` (0xDF11) |
-
-To use VID/PID from app header, uncomment this in `config.h`:
-```c
-#define USE_APP_HEADER_USB_IDS
-```
+This makes the bootloader product-agnostic — different applications can use different VID/PID values by defining `USB_VID` and `USB_PID` in their app header.
 
 **Key Rules:**
 - ❌ **Never** write to 0x08000000-0x08003FFF (bootloader region)
@@ -239,9 +231,13 @@ CRC32:            0xXXXXXXXX
 sudo dfu-util -l
 ```
 
-Expected output:
+Expected output (VID:PID depends on whether a valid application header is present):
 ```
 Found DFU: [0483:df11] ver=0200, devnum=X, cfg=1, intf=0, path="X-X", alt=0, name="@Internal Flash  /0x08004000/112*001Kg", serial="XXXXXXXXXXXX"
+```
+or (with valid app header, e.g. 1234:6789):
+```
+Found DFU: [1234:6789] ver=0200, devnum=X, cfg=1, intf=0, path="X-X", alt=0, name="@Internal Flash  /0x08004000/112*001Kg", serial="XXXXXXXXXXXX"
 ```
 
 **Step 3: Upload firmware**

@@ -111,34 +111,32 @@ static USBDescriptor vcom_device_descriptor = {
 /**
  * @brief Get USB VID/PID from application header or use defaults
  * 
- * Behavior depends on USE_APP_HEADER_USB_IDS configuration:
- * - When defined: If a valid application is present (magic == APP_HEADER_MAGIC),
- *   the VID/PID from the application header are returned. Otherwise, the default
- *   values from config.h are used.
- * - When undefined: Returns USB_DEFAULT_VID and USB_DEFAULT_PID.
+ * If a valid application is present (magic == APP_HEADER_MAGIC) and the
+ * VID/PID fields contain sane values, those are used. This allows each
+ * application to define its own USB identity that the bootloader inherits
+ * in DFU mode.
+ * 
+ * Falls back to USB_DEFAULT_VID/PID (STM32 DFU) when:
+ * - No valid application header (blank/erased flash)
+ * - VID/PID values are 0x0000 or 0xFFFF (erased/uninitialised)
  * 
  * @param[out] vid  Pointer to store USB Vendor ID
  * @param[out] pid  Pointer to store USB Product ID
  */
 static void get_usb_vid_pid(uint16_t *vid, uint16_t *pid) {
-#ifdef USE_APP_HEADER_USB_IDS
     const app_header_t *header = (const app_header_t *)APP_BASE;
-    
-    if (header->magic == APP_HEADER_MAGIC) {
-        /* Valid application header - use its VID/PID */
+
+    if (header->magic == APP_HEADER_MAGIC &&
+        header->usb_vid != 0x0000 && header->usb_vid != 0xFFFF &&
+        header->usb_pid != 0x0000 && header->usb_pid != 0xFFFF) {
+        /* Valid application header with sane VID/PID */
         *vid = header->usb_vid;
         *pid = header->usb_pid;
     } else {
-        /* No valid application - use defaults */
+        /* No valid application or invalid VID/PID - use defaults */
         *vid = USB_DEFAULT_VID;
         *pid = USB_DEFAULT_PID;
     }
-#else
-    /* USE_APP_HEADER_USB_IDS not defined - Use defaults */
-    (void)APP_BASE;  /* Suppress unused warning */
-    *vid = USB_DEFAULT_VID;
-    *pid = USB_DEFAULT_PID;
-#endif
 }
 
 /**

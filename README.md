@@ -62,7 +62,7 @@ cd bootloader && make clean && make
 # Flash to device over debugger (the first stlink it sees)
 st-flash --reset write build/bootloader.bin 0x08000000
 # Verify entered USB DFU mode
-lsusb | grep 0483:df11
+lsusb
 ```
 
 **Upload Application Firmware via USB DFU (Bootloader on chip):**
@@ -183,7 +183,7 @@ Test firmware placed under `test-firmwares`-folder.
 
 ```bash
 # 1. Check if bootloader is in DFU mode
-lsusb | grep 0483:df11
+lsusb
 # Expected: Bus XXX Device YYY: ID 0483:df11 STMicroelectronics STM32 Bootloader DFU Mode
 
 # 2. Verify DFU device detected
@@ -250,16 +250,11 @@ Applications must:
    } app_header_t;
    ```
    
-   **USB VID/PID:** When bootloader enters DFU mode, it reads VID/PID from the application header (if valid magic present). This allows the application to define its own USB identifiers that are used consistently in both DFU mode and normal operation. Default fallback: VID=0x0483 (STMicroelectronics), PID=0xDF11 (DFU).
-   
-   This behavior is controlled by `USE_APP_HEADER_USB_IDS` in `bootloader/inc/config.h`:
-   - **Defined:** Read VID/PID from app header, fallback to defaults if invalid.
-   - **Undefined:** Always use `USB_DEFAULT_VID` and `USB_DEFAULT_PID`.
+   **USB VID/PID:** When the bootloader enters DFU mode, it reads VID/PID from the application header (if valid magic is present and VID/PID values are sane). This allows each application to define its own USB identifiers that the bootloader inherits in DFU mode, so the device presents the same VID/PID in both normal and bootloader modes.
 
-    To use VID/PID from app header, uncomment this in `config.h`:
-    ```c
-    #define USE_APP_HEADER_USB_IDS
-    ```
+   If no valid application header is found (blank/erased flash, or VID/PID fields are `0x0000`/`0xFFFF`), the bootloader falls back to the STM32 DFU identifiers: VID=`0x0483` (STMicroelectronics), PID=`0xDF11` (DFU mode).
+
+   This makes the bootloader product-agnostic — different applications can use different VID/PID values by defining `USB_VID` and `USB_PID` in their app header.
 
 
 2. **Vector table at 0x08004100** (256-byte aligned, ARM Cortex-M0+ requirement)
